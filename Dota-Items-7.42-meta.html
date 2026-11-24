@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="Dota Items — справочник предметов Dota 2 с новыми предметами патча 7.42 и разделом сборок героев.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Dota Items — энциклопедия предметов Dota 2">
+<meta property="og:description" content="Изучай характеристики, способности, сборки и сравнивай предметы Dota 2.">
+<meta name="color-scheme" content="dark">
+<script src="https://telegram.org/js/telegram-web-app.js?62"></script>
+<title>Dota Items — энциклопедия предметов Dota 2</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0a0a;--surface:#141414;--surface2:#1c1c1c;--border:#2a2a2a;
+    --red:#c62828;--red-h:#e53935;--text:#e0e0e0;--muted:#9e9e9e;
+    --radius:10px;--shadow:0 8px 24px rgba(198,40,40,.18);
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+  button{cursor:pointer;font-family:inherit;border:none}
+  img{display:block}
+  .header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.94);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+  .hdr{max-width:1280px;margin:0 auto;padding:0 20px;height:64px;
+    display:flex;align-items:center;gap:16px}
+  .logo{font-size:1.25rem;font-weight:900;letter-spacing:-.5px;white-space:nowrap}
+  .logo span{color:var(--red)}
+  .hsearch{flex:1;max-width:380px;position:relative}
+  .hsearch input{width:100%;padding:10px 14px 10px 38px;background:var(--surface);
+    border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.9rem;outline:none;transition:.2s}
+  .hsearch input:focus{border-color:var(--red)}
+  .hsearch::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5;font-size:.85rem}
+  .nav{display:flex;gap:2px;margin-left:auto}
+  .nav button{background:none;color:var(--muted);padding:8px 12px;border-radius:8px;
+    font-size:.85rem;transition:.2s;white-space:nowrap}
+  .nav button:hover{color:var(--text);background:var(--surface2)}
+  .nav button.active{color:var(--red);background:var(--surface2)}
+  .btn-red{background:var(--red);color:#fff;padding:10px 18px;border-radius:8px;
+    font-weight:700;font-size:.85rem;transition:.2s;white-space:nowrap}
+  .btn-red:hover{background:var(--red-h);transform:translateY(-1px)}
+  .search-drop{position:absolute;top:calc(100% + 4px);left:0;right:0;
+    background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    max-height:320px;overflow-y:auto;display:none;z-index:150;
+    box-shadow:0 12px 32px rgba(0,0,0,.8)}
+  .search-drop.open{display:block}
+  .search-item{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;transition:.15s}
+  .search-item:hover{background:var(--surface2)}
+  .search-item img{width:32px;height:32px;object-fit:contain}
+  .search-item .si-name{font-size:.85rem;font-weight:600;flex:1}
+  .search-item .si-cost{font-size:.75rem;color:var(--red);font-weight:700}
+  .container{max-width:1280px;margin:0 auto;padding:0 20px}
+  .page{display:none;padding-bottom:60px}
+  .page.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .hero{text-align:center;padding:56px 20px 40px}
+  .hero h1{font-size:clamp(2.2rem,5vw,3.5rem);font-weight:900;letter-spacing:-1.5px;line-height:1.1}
+  .hero h1 span{color:var(--red)}
+  .hero p{color:var(--muted);max-width:600px;margin:14px auto 26px;font-size:1rem}
+  .hero-search{max-width:660px;margin:0 auto;position:relative}
+  .hero-search input{width:100%;padding:18px 24px 18px 54px;background:var(--surface);
+    border:1px solid var(--border);border-radius:14px;color:var(--text);font-size:1.05rem;
+    outline:none;transition:.2s}
+  .hero-search input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(198,40,40,.18)}
+  .hero-search::before{content:'🔍';position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:1.15rem;opacity:.5;z-index:1}
+  .section{padding:28px 0}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+  .sec-head h2{font-size:1.25rem;font-weight:800;letter-spacing:-.3px}
+  .sec-head h2 span{color:var(--red)}
+  .grid-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+  .grid-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px;text-align:center;transition:.2s;cursor:pointer;position:relative}
+  .card:hover{transform:translateY(-4px);border-color:var(--red);box-shadow:var(--shadow)}
+  .card img{width:52px;height:52px;margin:0 auto 8px;object-fit:contain;
+    filter:drop-shadow(0 2px 6px rgba(0,0,0,.7))}
+  .card .cname{font-size:.82rem;font-weight:700;line-height:1.2;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em}
+  .card .ccost{font-size:.72rem;color:var(--red);font-weight:700;margin-top:6px}
+  .card .ctags{display:flex;gap:4px;justify-content:center;margin-top:6px;flex-wrap:wrap}
+  .tag{font-size:.58rem;padding:2px 6px;border-radius:4px;background:var(--surface2);
+    color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+  .tag.red{color:var(--red)}
+  .cat-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px 14px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:12px}
+  .cat-tile:hover{border-color:var(--red);background:var(--surface2)}
+  .cat-tile .ci{font-size:1.4rem}
+  .cat-tile .cn{font-size:.85rem;font-weight:700}
+  .cat-tile .cc{font-size:.68rem;color:var(--muted);margin-top:2px}
+  .cat-layout{display:grid;grid-template-columns:240px 1fr;gap:22px;align-items:start;padding-top:20px}
+  .filters{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px;position:sticky;top:84px}
+  .fg{margin-bottom:18px}
+  .fg:last-child{margin-bottom:0}
+  .fg h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px}
+  .fg label{display:flex;align-items:center;gap:8px;font-size:.82rem;padding:4px 0;cursor:pointer;transition:.15s}
+  .fg label:hover{color:var(--red)}
+  .fg input[type=checkbox]{accent-color:var(--red);width:14px;height:14px}
+  .fg input[type=range]{width:100%;accent-color:var(--red)}
+  .price-val{font-size:.75rem;color:var(--red);font-weight:700;text-align:right}
+  .catalog-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:.82rem;color:var(--muted)}
+  .catalog-meta select{background:var(--surface);border:1px solid var(--border);color:var(--text);
+    padding:6px 10px;border-radius:6px;font-size:.8rem;outline:none}
+  .overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);
+    backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;
+    padding:24px 16px;overflow-y:auto}
+  .overlay.open{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+    max-width:720px;width:100%;padding:28px;position:relative;animation:up .3s ease;margin:auto 0}
+  @keyframes up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+  .close{position:absolute;top:14px;right:14px;background:var(--surface2);
+    border:1px solid var(--border);color:var(--muted);width:32px;height:32px;
+    border-radius:8px;font-size:1rem;transition:.2s}
+  .close:hover{color:var(--text);border-color:var(--red)}
+  .ihero{display:flex;gap:20px;align-items:flex-start;margin-bottom:22px;padding-right:32px}
+  .ihero img{width:80px;height:80px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(198,40,40,.35))}
+  .ihero h2{font-size:1.5rem;font-weight:900;line-height:1.2}
+  .ihero .price{color:var(--red);font-weight:800;font-size:1.05rem;margin-top:4px}
+  .ihero .badge{display:inline-block;font-size:.68rem;text-transform:uppercase;background:var(--surface2);
+    padding:3px 8px;border-radius:4px;color:var(--muted);margin-top:6px;letter-spacing:.5px}
+  .st-table{width:100%;border-collapse:collapse;margin-bottom:18px}
+  .st-table td{padding:8px 12px;border-bottom:1px solid var(--border);font-size:.88rem}
+  .st-table td:last-child{text-align:right;font-weight:700;color:var(--red)}
+  .ab-block{background:var(--surface2);border-radius:10px;padding:12px 16px;margin-bottom:10px}
+  .ab-block .ab-n{font-weight:800;color:var(--red);margin-bottom:2px;font-size:.92rem}
+  .ab-block .ab-m{font-size:.75rem;color:var(--muted);margin-bottom:6px}
+  .ab-block .ab-d{font-size:.86rem}
+  .sec-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.6px;
+    color:var(--muted);margin:18px 0 8px;font-weight:700}
+  .build-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}
+  .bnode{background:var(--surface2);border:1px solid var(--border);padding:5px 10px;
+    border-radius:6px;font-size:.78rem;display:flex;align-items:center;gap:6px;cursor:pointer;transition:.15s}
+  .bnode:hover{border-color:var(--red)}
+  .bnode img{width:22px;height:22px;object-fit:contain}
+  .bnode.cur{border-color:var(--red);color:var(--red);font-weight:700}
+  .arrow{color:var(--red);font-weight:800;font-size:.9rem}
+  .pc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+  .pc>div{background:var(--surface2);border-radius:10px;padding:12px 14px}
+  .pc h5{font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+  .pc .pros h5{color:#4caf50}
+  .pc .cons h5{color:#ef5350}
+  .pc ul{list-style:none}
+  .pc li{font-size:.82rem;padding:2px 0;color:var(--muted)}
+  .pc li::before{content:'• ';color:var(--red)}
+  .when{font-size:.85rem;color:var(--muted);margin-top:10px;padding:10px 12px;
+    background:rgba(198,40,40,.08);border-left:3px solid var(--red);border-radius:6px}
+  .when strong{color:var(--red)}
+  .cmp-ctrl{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+  .cmp-ctrl select{flex:1;min-width:170px;padding:10px 14px;background:var(--surface);
+    border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.88rem;outline:none}
+  .cmp-ctrl select:focus{border-color:var(--red)}
+  .cmp-tbl{width:100%;border-collapse:collapse;background:var(--surface);
+    border-radius:10px;overflow:hidden}
+  .cmp-tbl th,.cmp-tbl td{padding:11px 14px;border-bottom:1px solid var(--border);
+    font-size:.84rem;text-align:left}
+  .cmp-tbl th{background:var(--surface2);color:var(--muted);font-weight:700}
+  .cmp-tbl th:first-child{color:var(--red)}
+  .best{color:#4caf50;font-weight:800}
+  .worst{color:#ef5350}
+  .sit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  .sit-card{background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:18px;transition:.2s}
+  .sit-card:hover{border-color:var(--red);transform:translateY(-2px)}
+  .sit-card h3{font-size:1rem;margin-bottom:8px;color:var(--red);font-weight:800}
+  .sit-card p{font-size:.84rem;color:var(--muted);margin-bottom:10px}
+  .sit-items{display:flex;flex-wrap:wrap;gap:6px}
+  .sit-items span{background:var(--surface2);padding:4px 10px;border-radius:6px;
+    font-size:.76rem;cursor:pointer;transition:.15s}
+  .sit-items span:hover{background:var(--red);color:#fff}
+  .empty{text-align:center;padding:60px 20px;color:var(--muted);grid-column:1/-1;font-size:.9rem}
+  @media(max-width:960px){
+    .cat-layout{grid-template-columns:1fr}
+    .filters{position:static}
+    .hsearch{display:none}
+    .nav button{padding:8px 8px;font-size:.78rem}
+  }
+  @media(max-width:600px){
+    .hdr{height:auto;min-height:64px;flex-wrap:wrap;padding:10px 14px;gap:8px}
+    .nav{order:3;width:100%;margin-left:0;justify-content:space-between;overflow-x:auto;gap:2px;padding-bottom:2px}
+    .nav button{flex:0 0 auto}
+    .hero{padding:36px 16px 28px}
+    .grid-items{grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:8px}
+    .pc{grid-template-columns:1fr}
+    .ihero{flex-direction:column;align-items:center;text-align:center}
+    .modal{padding:20px}
+    .btn-red{padding:8px 12px;font-size:.78rem}
+    .logo{font-size:1rem}
+    .nav button{padding:7px 8px;font-size:.72rem}
+    .hdr .btn-red{margin-left:auto}
+  }
+
+  /* Telegram Mini App safe areas */
+  html{scroll-padding-top:env(safe-area-inset-top,0px)}
+  body{padding-bottom:env(safe-area-inset-bottom,0px)}
+  .header{top:env(safe-area-inset-top,0px)}
+
+
+  /* Dota Items visual refresh */
+  :root{
+    --bg:#08090d;--surface:#11141b;--surface2:#191e28;--border:#29313e;
+    --red:#e34b43;--red-h:#ff6258;--text:#f1f3f7;--muted:#9aa5b5;
+    --radius:14px;--shadow:0 16px 40px rgba(0,0,0,.38),0 0 24px rgba(227,75,67,.10);
+  }
+  body{
+    background:radial-gradient(ellipse at 50% -15%,rgba(143,35,35,.22),transparent 42%),
+      radial-gradient(ellipse at 100% 35%,rgba(48,61,85,.13),transparent 34%),var(--bg);
+    letter-spacing:.01em;
+  }
+  .header{background:rgba(8,9,13,.86);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 8px 28px rgba(0,0,0,.22)}
+  .hdr{height:72px}
+  .logo{font-size:1.35rem;letter-spacing:-.8px}
+  .logo span,.hero h1 span{background:linear-gradient(110deg,#ff766b,#c83232 72%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .nav button{font-weight:650;padding:9px 13px}
+  .nav button.active{color:#fff;background:rgba(227,75,67,.16);box-shadow:inset 0 0 0 1px rgba(227,75,67,.22)}
+  .btn-red{background:linear-gradient(135deg,#ed554b,#b9282c);border:1px solid rgba(255,255,255,.10);border-radius:10px;box-shadow:0 6px 18px rgba(190,43,43,.22)}
+  .btn-red:hover{background:linear-gradient(135deg,#ff6b60,#d53236);box-shadow:0 9px 24px rgba(190,43,43,.32)}
+  .hsearch input,.hero-search input,.cmp-ctrl select{background:rgba(21,25,34,.9);border-color:#303947;border-radius:12px}
+  .hsearch input:focus,.hero-search input:focus,.cmp-ctrl select:focus{border-color:#e34b43;box-shadow:0 0 0 3px rgba(227,75,67,.14)}
+  .hero{position:relative;isolation:isolate;overflow:hidden;padding:76px 20px 58px}
+  .hero:before{content:"";position:absolute;z-index:-1;width:min(760px,95vw);height:360px;left:50%;top:4px;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(178,43,43,.20),transparent 68%);filter:blur(12px);pointer-events:none}
+  .hero h1{font-size:clamp(2.7rem,7vw,5rem);letter-spacing:-2.8px;text-shadow:0 8px 35px rgba(0,0,0,.35)}
+  .hero p{font-size:1.04rem;line-height:1.75;color:#aab3c1;max-width:640px}
+  .hero-search{max-width:700px}
+  .hero-search input{padding:19px 24px 19px 56px;border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.28)}
+  .section{padding:30px 0}
+  .sec-head{margin-bottom:20px}
+  .sec-head h2{font-size:1.38rem;letter-spacing:-.5px}
+  .grid-items{gap:14px}
+  .card{background:linear-gradient(155deg,rgba(26,31,42,.98),rgba(15,18,25,.98));border-color:rgba(255,255,255,.075);border-radius:15px;padding:17px 12px;box-shadow:0 5px 18px rgba(0,0,0,.16);overflow:hidden}
+  .card:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.045),transparent 42%);opacity:.7;pointer-events:none}
+  .card:hover{transform:translateY(-6px);border-color:rgba(239,83,80,.72);box-shadow:0 16px 30px rgba(0,0,0,.34),0 0 22px rgba(198,40,40,.15)}
+  .card img{width:58px;height:58px;margin-bottom:11px;filter:drop-shadow(0 5px 9px rgba(0,0,0,.55));transition:transform .22s ease}
+  .card:hover img{transform:scale(1.09)}
+  .card .cname{font-size:.85rem;line-height:1.35}
+  .card .ccost{color:#ff7169;font-size:.78rem;margin-top:8px}
+  .tag{background:#252d3a;border:1px solid rgba(255,255,255,.045);border-radius:5px}
+  .cat-tile,.sit-card,.filters{background:linear-gradient(145deg,#151a24,#10141b);border-color:rgba(255,255,255,.08);border-radius:14px;box-shadow:0 7px 20px rgba(0,0,0,.13)}
+  .cat-tile{padding:18px 16px}
+  .cat-tile:hover{border-color:rgba(227,75,67,.6);background:linear-gradient(145deg,#202431,#151922);transform:translateY(-2px)}
+  .filters{padding:19px}
+  .fg h4{color:#c0c8d4;letter-spacing:.8px}
+  .search-drop{background:#151a24;border-color:#303947;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,.55)}
+  .search-item:hover{background:#222a37}
+  .modal{background:#141923;border:1px solid rgba(255,255,255,.1);border-radius:18px;box-shadow:0 25px 80px rgba(0,0,0,.65)}
+  .pc>div{background:#1b222e;border:1px solid rgba(255,255,255,.045)}
+  .bnode{background:#1b222e;border-color:#303947;border-radius:8px}
+  .cmp-tbl{background:#121721;border:1px solid #29313e;border-radius:12px}
+  .cmp-tbl th{background:#1b222e}
+  .sit-card{padding:21px}
+  button,input,select{ -webkit-tap-highlight-color:transparent }
+  button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid rgba(255,105,95,.8);outline-offset:2px}
+  @media(max-width:960px){.hdr{height:auto;min-height:68px}}
+  @media(max-width:600px){
+    .hero{padding:48px 15px 36px}
+    .hero h1{font-size:clamp(2.5rem,13vw,3.6rem);letter-spacing:-1.8px}
+    .hero p{font-size:.92rem;margin:12px auto 22px}
+    .hero-search input{padding:16px 17px 16px 48px;font-size:.95rem}
+    .grid-items{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .card{padding:15px 9px;min-height:126px}
+    .card img{width:54px;height:54px}
+    .sec-head h2{font-size:1.18rem}
+    .nav{border-top:1px solid rgba(255,255,255,.07);padding-top:7px}
+    .nav button{font-size:.73rem}
+    .filters{padding:15px}
+  }
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+
+  .hero-note{color:var(--muted);margin:8px 0 16px;font-size:.92rem}
+  .heroes-search{width:100%;max-width:520px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:13px 15px;margin:8px 0 16px;outline:none}
+  .heroes-search:focus{border-color:var(--red)}
+  .heroes-status{color:var(--muted);font-size:.85rem;margin:6px 0 14px}
+  .heroes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px}
+  .hero-tile{background:linear-gradient(145deg,#1b1b1b,#111);border:1px solid var(--border);border-radius:12px;padding:10px;text-align:left;color:var(--text);transition:transform .2s,border-color .2s;min-width:0}
+  .hero-tile:hover{transform:translateY(-3px);border-color:var(--red)}
+  .hero-tile img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:7px;margin-bottom:8px;background:#252525}
+  .hero-tile strong{font-size:.84rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .hero-tile small{color:var(--muted);font-size:.7rem}
+  .hero-build{margin:22px 0 40px}
+  .build-hero-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+  .build-hero-head img{width:132px;aspect-ratio:16/9;object-fit:cover;border-radius:10px}
+  .build-phase{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px;margin:12px 0}
+  .build-phase h3{font-size:1rem;margin-bottom:10px;color:#fff}
+  .build-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .build-chip{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);padding:7px 9px;border-radius:9px;font-size:.78rem}
+  .build-chip img{width:30px;height:22px;object-fit:contain}
+  .build-disclaimer{color:var(--muted);font-size:.8rem;margin-top:12px;line-height:1.5}
+  @media(max-width:600px){.heroes-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.hero-tile{padding:8px}.build-hero-head img{width:108px}}
+
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="hdr">
+    <div class="logo">DOTA <span>ITEMS</span></div>
+    <div class="hsearch">
+      <input id="hsearch" type="text" placeholder="Найти предмет..." autocomplete="off">
+      <div class="search-drop" id="hsearch-drop"></div>
+    </div>
+    <nav class="nav">
+      <button data-page="home" class="active">Главная</button>
+      <button data-page="catalog">Каталог</button>
+      <button data-page="heroes">Герои</button>
+      <button data-page="compare">Сравнение</button>
+      <button data-page="situations">Ситуации</button>
+      <button data-page="tips">Советы</button>
+    </nav>
+    <button class="btn-red" onclick="go('catalog')">📖 Каталог</button>
+  </div>
+</header>
+
+<main>
+  <section id="page-home" class="page active">
+    <div class="hero">
+      <h1>DOTA <span>ITEMS</span></h1>
+      <p>Полная энциклопедия предметов Dota 2: характеристики, сборка, способности и ситуации, когда их покупать.</p>
+      <div class="hero-search">
+        <input id="hero-search-input" type="text" placeholder="Найти предмет по названию..." autocomplete="off">
+        <div class="search-drop" id="hero-search-drop"></div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="section">
+        <div class="sec-head"><h2>🔥 <span>Популярные</span> предметы</h2>
+          <button class="btn-red" style="padding:6px 14px;font-size:.78rem" onclick="go('catalog')">Все →</button></div>
+        <div class="grid-items" id="popular-grid"></div>
+      </div>
+      <div class="section">
+        <div class="sec-head"><h2>📂 <span>Категории</span></h2></div>
+        <div class="grid-cats" id="cats-grid"></div>
+      </div>
+      <div class="section">
+        <div class="sec-head"><h2>🆕 <span>Ключевые</span> артефакты</h2></div>
+        <div class="grid-items" id="key-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="page-catalog" class="page">
+    <div class="container">
+      <div class="cat-layout">
+        <aside class="filters">
+          <div class="fg">
+            <h4>Категория</h4>
+            <label><input type="checkbox" class="f-cat" value="starter">Начальные</label>
+            <label><input type="checkbox" class="f-cat" value="basic">Основные</label>
+            <label><input type="checkbox" class="f-cat" value="upgrade">Улучшения</label>
+            <label><input type="checkbox" class="f-cat" value="magic">Магические</label>
+            <label><input type="checkbox" class="f-cat" value="defensive">Защитные</label>
+            <label><input type="checkbox" class="f-cat" value="artifact">Артефакты</label>
+            <label><input type="checkbox" class="f-cat" value="neutral">Нейтральные</label>
+          </div>
+          <div class="fg">
+            <h4>Цена (золото)</h4>
+            <input type="range" id="f-price" min="0" max="7500" value="7500" step="50">
+            <div class="price-val" id="f-price-val">7500</div>
+          </div>
+          <div class="fg">
+            <h4>Характеристики</h4>
+            <label><input type="checkbox" class="f-stat" value="damage">Даёт урон</label>
+            <label><input type="checkbox" class="f-stat" value="armor">Даёт броню</label>
+            <label><input type="checkbox" class="f-stat" value="mana">Даёт ману</label>
+            <label><input type="checkbox" class="f-stat" value="active">Активный предмет</label>
+            <label><input type="checkbox" class="f-stat" value="passive">Пассивный предмет</label>
+          </div>
+        </aside>
+        <div>
+          <div class="catalog-meta">
+            <span id="cat-count">—</span>
+            <select id="sort-by">
+              <option value="name">По названию (А-Я)</option>
+              <option value="cost-asc">По цене ↑</option>
+              <option value="cost-desc">По цене ↓</option>
+            </select>
+          </div>
+          <div class="grid-items" id="catalog-grid"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="page-heroes" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="sec-head"><h2>🦸 <span>Сборки</span> героев</h2><span class="muted">Все герои Dota 2</span></div>
+      <p class="hero-note">Выбери героя, чтобы открыть базовую сборку по этапам игры. Предметы адаптируй под составы команд и ход матча.</p>
+      <input id="heroes-search" class="heroes-search" type="search" placeholder="Найти героя...">
+      <div id="heroes-status" class="heroes-status">Загружаем список героев…</div>
+      <div id="heroes-grid" class="heroes-grid"></div>
+      <div id="hero-build" class="hero-build"></div>
+    </div>
+  </section>
+
+  <section id="page-compare" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="sec-head"><h2>⚖️ <span>Сравнение</span> предметов</h2></div>
+      <div class="cmp-ctrl">
+        <select id="cmp-a"></select>
+        <select id="cmp-b"></select>
+        <select id="cmp-c"></select>
+      </div>
+      <div id="cmp-result"></div>
+    </div>
+  </section>
+
+  <section id="page-situations" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="sec-head"><h2>🎯 Лучшие предметы для <span>ситуаций</span></h2></div>
+      <div class="sit-grid" id="sit-grid"></div>
+    </div>
+  </section>
+
+  <section id="page-tips" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="sec-head"><h2>💡 <span>Рекомендации</span> по использованию</h2></div>
+      <div class="sit-grid">
+        <div class="sit-card">
+          <h3>Новичкам</h3>
+          <p>• Не покупайте дорогие предметы «по гайду», если не понимаете их назначение.<br><br>
+             • Начинайте с малого: Tango, Magic Wand, Boots of Speed.<br><br>
+             • Black King Bar — не панацея, а инструмент против конкретных угроз (магия и контроль).<br><br>
+             • Открывайте предмет на сайте, чтобы понять, из чего он собирается.</p>
+        </div>
+        <div class="sit-card">
+          <h3>Опытным игрокам</h3>
+          <p>• Адаптируйте сборку под каждую игру — itemization решает.<br><br>
+             • Сравнивайте эффективность по цене/золоту (Maelstrom vs Battle Fury).<br><br>
+             • Учитывайте тайминги нейтральных предметов: нейтральные предметы распределены по четырём тиру.<br><br>
+             • Используйте сравнение на сайте, чтобы взвесить альтернативы.</p>
+        </div>
+        <div class="sit-card">
+          <h3>Про тайминги</h3>
+          <p>• Ранняя игра (0–15 мин): Tango, Magic Stick, Boots, Bracer.<br><br>
+             • Средняя игра (15–35 мин): Blink, BKB, Force Staff, Maelstrom.<br><br>
+             • Лейт (35+ мин): Butterfly, Daedalus, Skadi, Heart, Abyssal.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+/* ============ КАТЕГОРИИ ============ */
+const CATS = {
+  starter:{label:'Начальные',icon:'🌱'},
+  basic:{label:'Основные',icon:'⚙️'},
+  upgrade:{label:'Улучшения',icon:'⬆️'},
+  magic:{label:'Магические',icon:'🔮'},
+  defensive:{label:'Защитные',icon:'🛡️'},
+  artifact:{label:'Артефакты',icon:'💎'},
+  neutral:{label:'Нейтральные',icon:'🌲'},
+};
+
+/* ============ Каталог предметов Dota Items ============ */
+/* Патч 7.42: обновлены цены существующих карточек по официальным заметкам. Новые предметы и характеристики требуют отдельного добавления/сверки. */
+const ITEMS = [
+// ===== STARTER (18) =====
+{k:'tango',n:'Tango',c:'starter',p:90,st:{},a:null,ps:{n:'Shared Tango',d:'Восстанавливает 7 HP/сек в течение 16 сек. Можно применить на союзника.',cd:0,m:0},comp:[],into:['healing_salve'],pr:['Дешёвый хил','Можно делиться с союзником'],co:['Тратится быстро','Занимает слот'],sit:['lane'],pop:true},
+{k:'flask',n:'Healing Salve',c:'starter',p:100,st:{},a:{n:'Salve',d:'Восстанавливает 400 HP за 10 сек.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Мощный хил'],co:['Прерывается уроном'],sit:['lane'],pop:true},
+{k:'clarity',n:'Clarity',c:'starter',p:50,st:{},a:{n:'Clarity',d:'Восстанавливает 150 маны за 25 сек.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Дешёвая мана'],co:['Прерывается уроном'],sit:['lane'],pop:false},
+{k:'faerie_fire',n:'Faerie Fire',c:'starter',p:65,st:{damage:2},a:{n:'Heal',d:'Мгновенно восстанавливает 85 HP.',cd:5,m:0},ps:null,comp:[],into:[],pr:['Бонусный урон','Экстренный хил'],co:['Мало хила'],sit:['lane'],pop:false},
+{k:'enchanted_mango',n:'Enchanted Mango',c:'starter',p:65,st:{hpRegen:.4},a:{n:'Eat',d:'Мгновенно восстанавливает 100 маны.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Мгновенная мана','Реген HP'],co:['Одноразовый'],sit:['lane'],pop:false},
+{k:'branches',n:'Iron Branch',c:'starter',p:55,st:{allStats:1},a:null,ps:null,comp:[],into:['magic_wand'],pr:['+1 ко всем атрибутам','Дёшево'],co:['Занимает слот'],sit:['stats'],pop:true},
+{k:'magic_stick',n:'Magic Stick',c:'starter',p:200,st:{},a:{n:'Energy Charge',d:'Восстанавливает HP и ману за каждую заряженную способность врага (15 HP/мана за заряд).',cd:0,m:0},ps:null,comp:['branches'],into:['magic_wand'],pr:['Спасает в замесах','Не требует маны'],co:['Нужны заряды'],sit:['vs_spam'],pop:true},
+{k:'blight_stone',n:'Blight Stone',c:'starter',p:300,st:{},a:null,ps:{n:'Lesser Corruption',d:'Атаки снижают броню цели на 2 на 8 сек.',cd:0,m:0},comp:[],into:['medallion_of_courage','desolator'],pr:['Снижение брони'],co:['Нет прямого урона'],sit:['physical'],pop:false},
+{k:'slippers',n:'Slippers of Agility',c:'starter',p:140,st:{agility:3},a:null,ps:null,comp:[],into:['wraith_band'],pr:['+3 ловкости'],co:['Мало статов'],sit:['stats'],pop:false},
+{k:'gauntlets',n:'Gauntlets of Strength',c:'starter',p:140,st:{strength:3},a:null,ps:null,comp:[],into:['bracer'],pr:['+3 силы'],co:['Мало статов'],sit:['stats'],pop:false},
+{k:'mantle',n:'Mantle of Intelligence',c:'starter',p:140,st:{intelligence:3},a:null,ps:null,comp:[],into:['null_talisman'],pr:['+3 интеллекта'],co:['Мало статов'],sit:['stats'],pop:false},
+{k:'circlet',n:'Circlet',c:'starter',p:155,st:{allStats:2},a:null,ps:null,comp:[],into:['bracer','wraith_band','null_talisman'],pr:['+2 ко всем атрибутам'],co:['Средняя цена для старта'],sit:['stats'],pop:false},
+{k:'quelling_blade',n:'Quelling Blade',c:'starter',p:100,st:{},a:null,ps:{n:'Chop',d:'+7 урона по крипам, +18 по деревьям.',cd:0,m:0},comp:[],into:['battle_fury'],pr:['Помогает фармить','Убивает деревья'],co:['Только по крипам'],sit:['farming'],pop:false},
+{k:'bottle',n:'Bottle',c:'starter',p:675,st:{hpRegen:2.5,manaRegen:1},a:{n:'Regenerate',d:'Восстанавливает 110 HP и 70 маны за заряд (3 заряда).',cd:0,m:0},ps:null,comp:[],into:[],pr:['Отличный реген для мидера','Руны для перезарядки'],co:['Дорого для старта'],sit:['lane'],pop:true},
+{k:'ward_observer',n:'Observer Ward',c:'starter',p:0,st:{},a:{n:'Place Ward',d:'Устанавливает вард на 6 минут с обзором.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Контроль карты','Бесплатно'],co:['Убивается врагом'],sit:['support'],pop:true},
+{k:'ward_sentry',n:'Sentry Ward',c:'starter',p:50,st:{},a:{n:'Place Sentry',d:'Раскрывает невидимок в радиусе 900 на 7 минут.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Детект невидимок'],co:['Тратится'],sit:['vs_invis'],pop:true},
+{k:'smoke_of_deceit',n:'Smoke of Deceit',c:'starter',p:50,st:{},a:{n:'Smoke',d:'Даёт невидимость для команды на 35 сек.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Скрытая инициация'],co:['Одноразовый'],sit:['initiation'],pop:false},
+{k:'dust',n:'Dust of Appearance',c:'starter',p:80,st:{},a:{n:'Reveal',d:'Раскрывает невидимых врагов на 12 сек.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Мгновенный детект'],co:['Одноразовый'],sit:['vs_invis'],pop:false},
+
+// ===== BASIC (39) =====
+{k:'boots',n:'Boots of Speed',c:'basic',p:500,st:{moveSpeed:45},a:null,ps:null,comp:[],into:['power_treads','phase_boots','arcane_boots','tranquil_boots','travel_boots','guardian_greaves'],pr:['Мобильность обязательна'],co:['Не даёт других бонусов'],sit:['mobility'],pop:true},
+{k:'gloves',n:'Gloves of Haste',c:'basic',p:450,st:{attackSpeed:20},a:null,ps:null,comp:[],into:['power_treads','mjollnir','hand_of_midas'],pr:['+20 скорости атаки'],co:['Только AS'],sit:['attack_speed'],pop:false},
+{k:'chainmail',n:'Chainmail',c:'basic',p:500,st:{armor:4},a:null,ps:null,comp:[],into:['phase_boots','buckler','blade_mail'],pr:['+4 брони'],co:['Только броня'],sit:['armor'],pop:false},
+{k:'ring_of_protection',n:'Ring of Protection',c:'basic',p:175,st:{armor:2},a:null,ps:null,comp:[],into:['buckler','soul_ring','ring_of_basilius'],pr:['+2 брони'],co:['Мало'],sit:['armor'],pop:false},
+{k:'ring_of_regen',n:'Ring of Regen',c:'basic',p:175,st:{hpRegen:1.25},a:null,ps:null,comp:[],into:['tranquil_boots','headress'],pr:['+1.25 HP/сек'],co:['Мало'],sit:['sustain'],pop:false},
+{k:'sobi_mask',n:"Sage's Mask",c:'basic',p:175,st:{manaRegen:.7},a:null,ps:null,comp:[],into:['orchid','ring_of_basilius'],pr:['+0.7 реген маны'],co:['Мало'],sit:['mana'],pop:false},
+{k:'void_stone',n:'Void Stone',c:'basic',p:700,st:{manaRegen:1.25},a:null,ps:null,comp:[],into:['cyclone','sphere','scythe','aether_lens'],pr:['+1.25 реген маны'],co:['Дорого для базового'],sit:['mana'],pop:false},
+{k:'energy_booster',n:'Energy Booster',c:'basic',p:800,st:{mana:250},a:null,ps:null,comp:[],into:['arcane_boots','aghanims_scepter','bloodstone','aether_lens'],pr:['+250 маны'],co:['Нет регена'],sit:['mana'],pop:false},
+{k:'vitality_booster',n:'Vitality Booster',c:'basic',p:1000,st:{health:250},a:null,ps:null,comp:[],into:['aghanims_scepter','heart','aeon_disk','vanguard','soul_booster','spirit_vessel'],pr:['+250 HP'],co:['Нет брони'],sit:['health'],pop:false},
+{k:'point_booster',n:'Point Booster',c:'basic',p:1200,st:{health:175,mana:175},a:null,ps:null,comp:[],into:['aghanims_scepter','aeon_disk','sphere','skadi','soul_booster'],pr:['+175 HP и маны'],co:['Дорого'],sit:['health'],pop:false},
+{k:'ogre_axe',n:'Ogre Axe',c:'basic',p:1000,st:{strength:10},a:null,ps:null,comp:[],into:['black_king_bar','sange','aghanims_scepter','echo_sabre','meteor_hammer'],pr:['+10 силы'],co:['Только сила'],sit:['strength'],pop:false},
+{k:'blade_of_alacrity',n:'Blade of Alacrity',c:'basic',p:1000,st:{agility:10},a:null,ps:null,comp:[],into:['aghanims_scepter','yasha','manta','diffusal_blade','dragon_lance'],pr:['+10 ловкости'],co:['Только ловкость'],sit:['agility'],pop:false},
+{k:'staff_of_wizardry',n:'Staff of Wizardry',c:'basic',p:1000,st:{intelligence:10},a:null,ps:null,comp:[],into:['aghanims_scepter','cyclone','kaya','rod_of_atos'],pr:['+10 интеллекта'],co:['Только интеллект'],sit:['intelligence'],pop:false},
+{k:'broadsword',n:'Broadsword',c:'basic',p:1000,st:{damage:18},a:null,ps:null,comp:[],into:['battle_fury','blade_mail','mage_slayer'],pr:['+18 урона'],co:['Только урон'],sit:['damage'],pop:false},
+{k:'claymore',n:'Claymore',c:'basic',p:1350,st:{damage:21},a:null,ps:null,comp:[],into:['battle_fury','greater_crit','satanic'],pr:['+21 урона'],co:['Только урон'],sit:['damage'],pop:false},
+{k:'mithril_hammer',n:'Mithril Hammer',c:'basic',p:1600,st:{damage:24},a:null,ps:null,comp:[],into:['black_king_bar','desolator','battle_fury','skull_basher'],pr:['+24 урона'],co:['Дорого для компонента'],sit:['damage'],pop:false},
+
+{k:'helm_of_iron_will',n:'Helm of Iron Will',c:'basic',p:975,st:{armor:5,hpRegen:5},a:null,ps:null,comp:[],into:['armlet','hood_of_defiance','helm_of_the_dominator'],pr:['Броня и реген'],co:['Средняя цена'],sit:['armor'],pop:false},
+{k:'cloak',n:'Cloak',c:'basic',p:800,st:{magicResist:20},a:null,ps:null,comp:[],into:['hood_of_defiance','glimmer_cape','pipe','mage_slayer'],pr:['+20% сопр. магии'],co:['Только магия'],sit:['vs_magic'],pop:false},
+{k:'platemail',n:'Platemail',c:'basic',p:1400,st:{armor:10},a:null,ps:null,comp:[],into:['assault','shivas_guard','lotus_orb'],pr:['+10 брони'],co:['Дорого'],sit:['armor'],pop:false},
+{k:'quarterstaff',n:'Quarterstaff',c:'basic',p:900,st:{damage:10,attackSpeed:10},a:null,ps:null,comp:[],into:['butterfly','orchid','echo_sabre','moon_shard'],pr:['Урон и AS'],co:['Средние статы'],sit:['attack_speed'],pop:false},
+{k:'talisman_of_evasion',n:'Talisman of Evasion',c:'basic',p:1300,st:{evasion:20},a:null,ps:null,comp:[],into:['butterfly','heavens_halberd'],pr:['+20% уклонения'],co:['Не от магии'],sit:['vs_physical'],pop:false},
+{k:'ultimate_orb',n:'Ultimate Orb',c:'basic',p:2800,st:{allStats:10},a:null,ps:null,comp:[],into:['skadi','manta','sphere','silver_edge','scythe'],pr:['+10 ко всем статам'],co:['Дорого'],sit:['stats'],pop:false},
+{k:'reaver',n:'Reaver',c:'basic',p:2800,st:{strength:25},a:null,ps:null,comp:[],into:['satanic','heart'],pr:['+25 силы'],co:['Только сила'],sit:['strength'],pop:false},
+{k:'mystic_staff',n:'Mystic Staff',c:'basic',p:2800,st:{intelligence:25},a:null,ps:null,comp:[],into:['shivas_guard','scythe','wind_waker','octarine_core'],pr:['+25 интеллекта'],co:['Только интеллект'],sit:['intelligence'],pop:false},
+{k:'eaglesong',n:'Eaglesong',c:'basic',p:2800,st:{agility:25},a:null,ps:null,comp:[],into:['butterfly','swift_blink'],pr:['+25 ловкости'],co:['Только ловкость'],sit:['agility'],pop:false},
+{k:'relic',n:'Sacred Relic',c:'basic',p:3800,st:{damage:60},a:null,ps:null,comp:[],into:['radiance','nullifier'],pr:['+60 урона'],co:['Очень дорого'],sit:['damage'],pop:false},
+{k:'demon_edge',n:'Demon Edge',c:'basic',p:2200,st:{damage:40},a:null,ps:null,comp:[],into:['greater_crit','monkey_king_bar'],pr:['+40 урона'],co:['Только урон'],sit:['damage'],pop:false},
+{k:'hyperstone',n:'Hyperstone',c:'basic',p:2000,st:{attackSpeed:60},a:null,ps:null,comp:[],into:['assault','mjollnir','moon_shard','bloodthorn'],pr:['+60 AS'],co:['Только AS'],sit:['attack_speed'],pop:false},
+{k:'blitz_knuckles',n:'Blitz Knuckles',c:'basic',p:1000,st:{attackSpeed:35},a:null,ps:null,comp:[],into:['witch_blade','invis_sword','mage_slayer','monkey_king_bar'],pr:['+35 AS'],co:['Только AS'],sit:['attack_speed'],pop:false},
+{k:'crown',n:'Crown',c:'basic',p:450,st:{allStats:4},a:null,ps:null,comp:[],into:['heavens_halberd','solar_crest','harpoon','rod_of_atos','sange','yasha','kaya'],pr:['+4 ко всем статам'],co:['Мало'],sit:['stats'],pop:false},
+{k:'orb_of_venom',n:'Orb of Venom',c:'basic',p:275,st:{},a:null,ps:{n:'Poison Attack',d:'Замедляет цель на 13% и наносит 4 урона в сек 3 сек.',cd:0,m:0},comp:[],into:['skadi','orb_of_corrosion'],pr:['Дешёвый замедляющий эффект'],co:['Слабый урон'],sit:['slow'],pop:false},
+{k:'ring_of_health',n:'Ring of Health',c:'basic',p:700,st:{hpRegen:5},a:null,ps:null,comp:[],into:['vanguard','battle_fury','pipe','hood_of_defiance'],pr:['+5 HP/сек'],co:['Только реген'],sit:['sustain'],pop:false},
+{k:'shadow_amulet',n:'Shadow Amulet',c:'basic',p:1000,st:{},a:{n:'Fade',d:'Даёт невидимость после 1.25 сек.',cd:7,m:0},ps:null,comp:[],into:['invis_sword','glimmer_cape'],pr:['Невидимость'],co:['Долгая активация'],sit:['escape'],pop:false},
+{k:'robe_of_the_magi',n:'Robe of the Magi',c:'basic',p:450,st:{intelligence:6},a:null,ps:null,comp:[],into:['witch_blade','blade_mail','veil_of_discord','diffusal_blade'],pr:['+6 интеллекта'],co:['Только интеллект'],sit:['intelligence'],pop:false},
+{k:'wind_lace',n:'Wind Lace',c:'basic',p:225,st:{moveSpeed:15},a:null,ps:null,comp:[],into:['cyclone','drum_of_endurance','tranquil_boots'],pr:['+15 скорости'],co:['Мало'],sit:['mobility'],pop:false},
+{k:'gem',n:'Gem of True Sight',c:'basic',p:900,st:{},a:null,ps:{n:'True Sight',d:'Раскрывает невидимых врагов в радиусе 900. Теряется при смерти.',cd:0,m:0},comp:[],into:[],pr:['Постоянное зрение невидимок'],co:['Теряется при смерти'],sit:['vs_invis'],pop:false},
+{k:'morbid_mask',n:'Morbid Mask',c:'basic',p:900,st:{lifesteal:15},a:null,ps:null,comp:[],into:['mask_of_madness','satanic'],pr:['+15% вампиризма'],co:['Только вампиризм'],sit:['lifesteal'],pop:false},
+{k:'soul_booster',n:'Soul Booster',c:'basic',p:3000,st:{health:425,mana:425},a:null,ps:null,comp:['vitality_booster','energy_booster','point_booster'],into:['bloodstone','octarine_core'],pr:['+425 HP и маны'],co:['Дорого'],sit:['health'],pop:false},
+
+// ===== UPGRADE (31) =====
+{k:'power_treads',n:'Power Treads',c:'upgrade',p:1400,st:{attackSpeed:25,moveSpeed:45},a:{n:'Switch',d:'Переключает основной атрибут: сила / ловкость / интеллект (+10).',cd:0,m:0},ps:null,comp:['boots','gloves'],into:[],pr:['Гибкие статы','+25 AS'],co:['Дорого для старта'],sit:['carry'],pop:true},
+{k:'phase_boots',n:'Phase Boots',c:'upgrade',p:1500,st:{damage:18,armor:4,moveSpeed:50},a:{n:'Phase',d:'+20% скорости передвижения и игнорирование коллизий на 3.5 сек.',cd:8,m:0},ps:null,comp:['boots','blades_of_attack','chainmail'],into:[],pr:['Мобильность','Броня и урон'],co:['Нет атрибутов'],sit:['chase'],pop:true},
+{k:'arcane_boots',n:'Arcane Boots',c:'upgrade',p:1400,st:{moveSpeed:45,mana:250},a:{n:'Replenish',d:'Восстанавливает 175 маны всем союзникам в радиусе 1200.',cd:55,m:0},ps:null,comp:['boots','energy_booster'],into:['guardian_greaves'],pr:['Мана для команды'],co:['Нет урона'],sit:['support_mana'],pop:true},
+{k:'tranquil_boots',n:'Tranquil Boots',c:'upgrade',p:925,st:{armor:4,moveSpeed:70,hpRegen:14},a:null,ps:{n:'Break',d:'При получении урона от героя бонус скорости снижается на 13 сек.',cd:0,m:0},comp:['boots','ring_of_regen','ring_of_protection'],into:[],pr:['Огромная скорость','Реген HP'],co:['Ломается от урона'],sit:['support_mobility'],pop:true},
+{k:'magic_wand',n:'Magic Wand',c:'upgrade',p:450,st:{allStats:3},a:{n:'Energy Charge',d:'Мгновенно восстанавливает 15 HP и маны за заряд (макс. 20).',cd:0,m:0},ps:null,comp:['magic_stick','branches'],into:[],pr:['Спасает жизни','+3 ко всем статам'],co:['Нужны заряды'],sit:['vs_spam'],pop:true},
+{k:'hand_of_midas',n:'Hand of Midas',c:'upgrade',p:2200,st:{attackSpeed:40},a:{n:'Transmute',d:'Мгновенно убивает цель-крипа, давая 160 золота и 2.1× опыт.',cd:90,m:0},ps:null,comp:['gloves','recipe'],into:[],pr:['Ускоренный фарм','Опыт'],co:['Не даёт выживаемости'],sit:['farming'],pop:false},
+{k:'bracer',n:'Bracer',c:'upgrade',p:505,st:{strength:6,agility:2,intelligence:2,damage:3,health:100},a:null,ps:null,comp:['gauntlets','circlet','recipe'],into:[],pr:['Много статов за 505'],co:['Не улучшается'],sit:['stats'],pop:true},
+{k:'wraith_band',n:'Wraith Band',c:'upgrade',p:505,st:{agility:6,strength:2,intelligence:2,armor:3,attackSpeed:5},a:null,ps:null,comp:['slippers','circlet','recipe'],into:[],pr:['Статы для ловкачей'],co:['Не улучшается'],sit:['stats'],pop:true},
+{k:'null_talisman',n:'Null Talisman',c:'upgrade',p:505,st:{intelligence:6,strength:2,agility:2,mana:135},a:null,ps:null,comp:['mantle','circlet','recipe'],into:[],pr:['Статы для магов'],co:['Не улучшается'],sit:['stats'],pop:true},
+{k:'soul_ring',n:'Soul Ring',c:'upgrade',p:805,st:{hpRegen:2.5,armor:2},a:{n:'Sacrifice',d:'Тратит 170 HP, даёт 150 маны на 10 сек.',cd:25,m:0},ps:null,comp:['ring_of_protection','sobi_mask','recipe'],into:['bloodstone'],pr:['Много маны'],co:['Тратит HP'],sit:['mana'],pop:false},
+{k:'buckler',n:'Buckler',c:'upgrade',p:425,st:{armor:2},a:{n:'Armor Bonus',d:'+2 брони всем союзникам (аура).',cd:0,m:0},ps:null,comp:['chainmail','ring_of_protection','recipe'],into:['mekansm','crimson_guard'],pr:['Дешёвая аура брони'],co:['Мало брони'],sit:['teamfight'],pop:false},
+{k:'ring_of_basilius',n:'Ring of Basilius',c:'upgrade',p:425,st:{armor:1,manaRegen:1},a:{n:'Basilius Aura',d:'+1 брони и +1 реген маны союзникам.',cd:0,m:0},ps:null,comp:['ring_of_protection','sobi_mask'],into:['vladmir'],pr:['Аура для лейна'],co:['Мало'],sit:['support_mana'],pop:false},
+{k:'headress',n:'Headdress',c:'upgrade',p:425,st:{allStats:2},a:{n:'Regeneration Aura',d:'+2 HP/сек союзникам.',cd:0,m:0},ps:null,comp:['ring_of_regen','branches','recipe'],into:['mekansm','pipe'],pr:['Аура регена'],co:['Мало'],sit:['support'],pop:false},
+{k:'urn_of_shadows',n:'Urn of Shadows',c:'upgrade',p:875,st:{allStats:2,manaRegen:1},a:{n:'Soul Release',d:'Наносит 25 урона в сек или лечит союзника (заряды с убийств).',cd:7,m:0},ps:null,comp:['gauntlets','sobi_mask','recipe'],into:['spirit_vessel'],pr:['Хил/урон за заряды'],co:['Нужны заряды'],sit:['support'],pop:true},
+{k:'falcon_blade',n:'Falcon Blade',c:'upgrade',p:1125,st:{damage:14,health:150,mana:100},a:null,ps:null,comp:['blades_of_attack','sobi_mask','recipe'],into:[],pr:['Статы за 1125'],co:['Не улучшается'],sit:['stats'],pop:true},
+{k:'orb_of_corrosion',n:'Orb of Corrosion',c:'upgrade',p:880,st:{damage:10,armor:3},a:null,ps:{n:'Corrosion',d:'Атаки замедляют на 13%, наносят 12 урона в сек 3 сек.',cd:0,m:0},comp:['orb_of_venom','blight_stone','recipe'],into:[],pr:['Замедление + урон'],co:['Не улучшается'],sit:['slow'],pop:false},
+{k:'vladmir',n:"Vladmir's Offering",c:'upgrade',p:2200,st:{armor:3,manaRegen:1.5},a:{n:'Vladmir Aura',d:'+1.75 реген маны, +3 брони, +18% вампиризма, +18% урона союзникам.',cd:0,m:0},ps:null,comp:['ring_of_basilius','buckler','helm_of_iron_will','recipe'],into:[],pr:['Командная аура'],co:['Только аура'],sit:['teamfight'],pop:false},
+{k:'hood_of_defiance',n:'Hood of Defiance',c:'upgrade',p:1300,st:{hpRegen:8,magicResist:20},a:null,ps:{n:'Barrier',d:'При получении магического урона даёт барьер на 325 (CD 60 сек).',cd:60,m:0},comp:['cloak','ring_of_health','recipe'],into:['pipe'],pr:['Анти-магия'],co:['Только магия'],sit:['vs_magic'],pop:false},
+{k:'vanguard',n:'Vanguard',c:'upgrade',p:1700,st:{health:250,hpRegen:8,damageBlock:70},a:null,ps:{n:'Damage Block',d:'Блокирует 70 урона от атак (50% шанс для ближнего боя).',cd:0,m:0},comp:['ring_of_health','vitality_booster','recipe'],into:['crimson_guard','abyssal_blade'],pr:['Танк на лейне'],co:['Только блок атак'],sit:['tank'],pop:true},
+{k:'drum_of_endurance',n:'Drum of Endurance',c:'upgrade',p:1650,st:{allStats:4,moveSpeed:15},a:{n:'Endurance',d:'+45 AS и +13% скорости передвижения команде на 6 сек.',cd:45,m:0},ps:null,comp:['crown','wind_lace','recipe'],into:[],pr:['Аура для команды','Статы'],co:['Ограниченные заряды'],sit:['teamfight'],pop:true},
+{k:'heavens_halberd',n:"Heaven's Halberd",c:'upgrade',p:2400,st:{strength:12,armor:4.5,hpRegen:4.5},a:{n:'Disarm',d:'Обезоруживает цель на 3 секунды. Дальность применения 500, расход маны 50.',cd:18,m:50},ps:null,comp:['ogre_axe','helm_of_iron_will','recipe'],into:['skypiercer'],pr:['Обезоруживание','Сила и броня'],co:['Одна цель'],sit:['vs_carry'],pop:true},
+{k:'echo_sabre',n:'Echo Sabre',c:'upgrade',p:2500,st:{strength:15,damage:15,attackSpeed:10},a:null,ps:{n:'Echo Strike',d:'Следующая атака после способности бьёт дважды и замедляет.',cd:6,m:0},comp:['ogre_axe','quarterstaff','recipe'],into:['harpoon'],pr:['Двойной удар','Замедление'],co:['Нужен триггер'],sit:['carry'],pop:true},
+{k:'rod_of_atos',n:'Rod of Atos',c:'upgrade',p:2250,st:{intelligence:15,agility:15,strength:15},a:{n:'Cripple',d:'Обездвиживает цель на 2 сек.',cd:18,m:50},ps:null,comp:['staff_of_wizardry','crown','recipe'],into:['gleipnir'],pr:['Корни','Статы'],co:['Не работает сквозь BKB'],sit:['setup'],pop:true},
+{k:'kaya',n:'Kaya',c:'upgrade',p:2000,st:{intelligence:16,mana:200,manaRegen:2},a:null,ps:{n:'Amplify',d:'+12% к магическому и мана-урону, -25% расхода маны.',cd:0,m:0},comp:['staff_of_wizardry','sobi_mask','recipe'],into:['kaya_and_sange','yasha_and_kaya'],pr:['Усиление магии'],co:['Только для магов'],sit:['caster'],pop:false},
+{k:'sange',n:'Sange',c:'upgrade',p:2000,st:{strength:16,health:300},a:null,ps:{n:'Lesser Maim',d:'25% шанс замедлить цель на 20% и нанести доп. урон.',cd:0,m:0},comp:['ogre_axe','crown','recipe'],into:['heavens_halberd','sange_and_yasha','kaya_and_sange','harpoon'],pr:['HP и сила','Замедление'],co:['Нет мобильности'],sit:['tank'],pop:false},
+{k:'yasha',n:'Yasha',c:'upgrade',p:2000,st:{agility:16,attackSpeed:15,moveSpeed:10},a:null,ps:null,comp:['blade_of_alacrity','crown','recipe'],into:['manta','sange_and_yasha','yasha_and_kaya'],pr:['Ловкость и скорость'],co:['Нет HP'],sit:['carry'],pop:false},
+{k:'mask_of_madness',n:'Mask of Madness',c:'upgrade',p:1800,st:{damage:15,lifesteal:20},a:{n:'Berserk',d:'+100 AS и +30% скорости, но -8 брони на 6 сек.',cd:16,m:0},ps:null,comp:['morbid_mask','quarterstaff','recipe'],into:[],pr:['Огромный DPS','Вампиризм'],co:['Снижает броню','Дезориентирует'],sit:['carry'],pop:false},
+{k:'travel_boots',n:'Boots of Travel',c:'upgrade',p:2500,st:{moveSpeed:90},a:{n:'Teleport',d:'Телепорт к союзнику или строению.',cd:40,m:0},ps:null,comp:['boots','recipe'],into:[],pr:['Мобильность по карте'],co:['Дорого'],sit:['mobility'],pop:true},
+{k:'dragon_lance',n:'Dragon Lance',c:'upgrade',p:1900,st:{agility:14,strength:14,damage:14},a:null,ps:{n:'Dragon Reach',d:'+140 к дальности атаки (для дальнего боя).',cd:0,m:0},comp:['blade_of_alacrity','ogre_axe','recipe'],into:['hurricane_pike'],pr:['Дальность атаки'],co:['Только для дальников'],sit:['ranged_carry'],pop:false},
+{k:'armlet',n:'Armlet of Mordiggian',c:'upgrade',p:2500,st:{damage:15,armor:6,hpRegen:7,attackSpeed:25},a:{n:'Unholy Strength',d:'+35 силы и +4 брони, но -45 HP/сек.',cd:0,m:0},ps:null,comp:['helm_of_iron_will','gloves','blades_of_attack','recipe'],into:[],pr:['Огромный DPS','Сила'],co:['Постоянно теряет HP при активации'],sit:['carry'],pop:true},
+
+// ===== MAGIC (6) =====
+{k:'cyclone',n:"Eul's Scepter of Divinity",c:'magic',p:2625,st:{intelligence:10,manaRegen:2.5,moveSpeed:20},a:{n:'Cyclone',d:'Подбрасывает цель на 2.5 сек, делая её неуязвимой.',cd:23,m:175},ps:null,comp:['staff_of_wizardry','void_stone','wind_lace','recipe'],into:['wind_waker'],pr:['Сетап на цель','Спасение','Снимает дебаффы'],co:['Цель неуязвима'],sit:['setup'],pop:true},
+{k:'orchid',n:'Orchid Malevolence',c:'magic',p:3275,st:{intelligence:20,attackSpeed:30,manaRegen:3},a:{n:'Soul Burn',d:'Накладывает сайленс на 5 сек и наносит 300 урона по окончании.',cd:18,m:100},ps:null,comp:['oblivion_staff','sobi_mask','recipe'],into:['bloodthorn'],pr:['Сайленс','Урон'],co:['Не даёт выживаемости'],sit:['vs_caster'],pop:false},
+{k:'dagon_5',n:'Dagon 5',c:'magic',p:7400,st:{allStats:10,health:240,mana:450},a:{n:'Energy Burst',d:'Наносит 800 урона цели.',cd:35,m:180},ps:null,comp:['dagon_4','recipe'],into:[],pr:['Огромный бурст'],co:['Очень дорого'],sit:['burst'],pop:false},
+{k:'veil_of_discord',n:'Veil of Discord',c:'magic',p:1725,st:{armor:4,allStats:5,manaRegen:1.5},a:{n:'Magic Weakness',d:'Увеличивает получаемый магический урон цели на 18% на 8 сек.',cd:22,m:50},ps:null,comp:['helm_of_iron_will','robe_of_the_magi','recipe'],into:[],pr:['Усиление магии команды'],co:['Не даёт защиты'],sit:['magic_damage'],pop:false},
+{k:'solar_crest',n:'Solar Crest',c:'magic',p:2575,st:{armor:4,allStats:5,manaRegen:1.5},a:{n:'Shine',d:'Даёт +6 брони или -6 брони цели на 7 сек.',cd:12,m:0},ps:null,comp:['medallion_of_courage','crown','recipe'],into:[],pr:['Броня для союзника','Снижение брони'],co:['Одна цель'],sit:['support'],pop:false},
+{k:'witch_blade',n:'Witch Blade',c:'magic',p:2600,st:{intelligence:12,attackSpeed:20,armor:5},a:{n:'Witch Blade',d:'Следующая атака наносит магический урон, равный 75 + 1.5× интеллекта.',cd:9,m:0},ps:null,comp:['blitz_knuckles','robe_of_the_magi','chainmail','recipe'],into:[],pr:['Магический урон с атак'],co:['Нужен интеллект'],sit:['magic_damage'],pop:false},
+
+// ===== DEFENSIVE (10) =====
+{k:'black_king_bar',n:'Black King Bar',c:'defensive',p:4050,st:{strength:10,damage:24},a:{n:'Avatar',d:'Даёт невосприимчивость к магии (debuff immunity) на 9/8/7/6 сек. Длительность падает с каждым использованием.',cd:75,m:0},ps:null,comp:['ogre_axe','mithril_hammer','recipe'],into:[],pr:['Спасает от магии и контроля','Обязателен против Lion, Shaman'],co:['Не защищает от физики','Долгий CD'],sit:['vs_magic','vs_disable'],pop:true},
+{k:'pipe',n:'Pipe of Insight',c:'defensive',p:3725,st:{health:450,hpRegen:10,magicResist:30},a:{n:'Barrier',d:'Даёт барьер, поглощающий 450 магического урона всем союзникам в радиусе.',cd:60,m:100},ps:null,comp:['hood_of_defiance','ring_of_health','recipe'],into:[],pr:['Командная защита от магии'],co:['Не защищает от физики'],sit:['vs_magic'],pop:true},
+{k:'crimson_guard',n:'Crimson Guard',c:'defensive',p:3625,st:{health:250,armor:12,damageBlock:70},a:{n:'Guard',d:'Блокирует 100% урона от атак всем союзникам в радиусе на 12 сек.',cd:70,m:0},ps:null,comp:['vanguard','buckler','recipe'],into:[],pr:['Против физического урона'],co:['Дорого'],sit:['vs_physical'],pop:false},
+{k:'blade_mail',n:'Blade Mail',c:'defensive',p:2350,st:{armor:6,damage:28,intelligence:10},a:{n:'Damage Return',d:'Отражает 85% полученного урона обратно атакующему на 4.5 сек.',cd:25,m:0},ps:null,comp:['broadsword','chainmail','robe_of_the_magi','recipe'],into:[],pr:['Анти-бёрст','Анти-керри'],co:['Только 4.5 сек'],sit:['vs_burst'],pop:false},
+{k:'aeon_disk',n:'Aeon Disk',c:'defensive',p:3000,st:{health:300,mana:300},a:null,ps:{n:'Combo Breaker',d:'При HP ниже 70% автоматически даёт 2.5 сек неуязвимости. Кулдаун 105 сек.',cd:105,m:0},comp:['vitality_booster','energy_booster','recipe'],into:[],pr:['Автоспасение от бурста'],co:['Долгий CD','Не защищает союзника'],sit:['vs_burst'],pop:false},
+{k:'sphere',n:"Linken's Sphere",c:'defensive',p:4800,st:{allStats:16,healthRegen:6,manaRegen:6},a:{n:'Transfer',d:'Переносит блок на союзника.',cd:0,m:0},ps:{n:'Spell Block',d:'Блокирует одно направленное заклинание раз в 12 сек.',cd:12,m:0},comp:['ultimate_orb','perseverance','recipe'],into:[],pr:['Блок одиночных заклинаний','Статы'],co:['Не работает против AoE','Не даёт выживаемости в бою'],sit:['vs_single_target'],pop:true},
+{k:'lotus_orb',n:'Lotus Orb',c:'defensive',p:3850,st:{armor:10,manaRegen:3,health:250},a:{n:'Echo Shell',d:'Отражает направленные заклинания обратно на 6 сек.',cd:15,m:100},ps:null,comp:['perseverance','platemail','recipe'],into:[],pr:['Отражение магии','Броня'],co:['Не защищает от AoE'],sit:['vs_targeted'],pop:false},
+{k:'guardian_greaves',n:'Guardian Greaves',c:'defensive',p:4350,st:{armor:5,health:250,mana:250,moveSpeed:50},a:{n:'Mend',d:'Лечит 350 HP и восстанавливает 200 маны команде.',cd:40,m:0},ps:{n:'Guardian Aura',d:'+3 брони и +2 HP/сек союзникам.',cd:0,m:0},comp:['arcane_boots','mekansm','recipe'],into:[],pr:['Командный хил','Аура'],co:['Очень дорого'],sit:['support'],pop:true},
+{k:'mekansm',n:'Mekansm',c:'defensive',p:1775,st:{allStats:5,armor:4},a:{n:'Restore',d:'Восстанавливает 275 HP и +2 брони команде.',cd:65,m:0},ps:null,comp:['headress','buckler','recipe'],into:['guardian_greaves'],pr:['Командный хил'],co:['Дорого для саппорта'],sit:['teamfight'],pop:false},
+{k:'glimmer_cape',n:'Glimmer Cape',c:'defensive',p:2150,st:{magicResist:20},a:{n:'Glimmer',d:'Даёт невидимость и +45% сопр. магии на 5 сек.',cd:14,m:0},ps:null,comp:['shadow_amulet','cloak','recipe'],into:[],pr:['Спасение союзника'],co:['Детектится'],sit:['save'],pop:true},
+
+// ===== ARTIFACT (46) =====
+{k:'blink',n:'Blink Dagger',c:'artifact',p:2250,st:{},a:{n:'Blink',d:'Телепортирует на 1200 юнитов.',cd:15,m:0},ps:null,comp:[],into:['overwhelming_blink','swift_blink','arcane_blink'],pr:['Мгновенная инициация','Мобильность'],co:['Не даёт статов','Блокируется уроном'],sit:['initiation','mobility'],pop:true},
+{k:'force_staff',n:'Force Staff',c:'artifact',p:2200,st:{intelligence:10,health:100},a:{n:'Force',d:'Толкает цель (или себя) на 600 юнитов вперёд.',cd:19,m:0},ps:null,comp:['staff_of_wizardry','ring_of_regen','recipe'],into:['hurricane_pike'],pr:['Спасение союзника','Инициация'],co:['Не даёт урона'],sit:['initiation','mobility'],pop:true},
+{k:'invis_sword',n:'Shadow Blade',c:'artifact',p:3000,st:{damage:35,attackSpeed:35},a:{n:'Shadow Walk',d:'Даёт невидимость на 14 сек, следующая атака наносит доп. урон 175.',cd:25,m:0},ps:null,comp:['shadow_amulet','blitz_knuckles','recipe'],into:['silver_edge'],pr:['Невидимость','Урон с атаки'],co:['Детектится'],sit:['escape'],pop:true},
+{k:'battle_fury',n:'Battle Fury',c:'artifact',p:4100,st:{damage:60,healthRegen:7,manaRegen:2.5},a:{n:'Chop',d:'Срубает деревья.',cd:0,m:0},ps:{n:'Cleave',d:'Атаки наносят 70% урона по площади вокруг цели (только по крипам — 100%).',cd:0,m:0},comp:['perseverance','broadsword','claymore','recipe'],into:[],pr:['Быстрый фарм','Урон и реген'],co:['Не даёт выживаемости'],sit:['farming'],pop:true},
+{k:'manta',n:'Manta Style',c:'artifact',p:4550,st:{agility:24,strength:12,intelligence:12,attackSpeed:25,moveSpeed:10},a:{n:'Mirror Image',d:'Создаёт 2 иллюзии, снимает дебаффы.',cd:34,m:125},ps:null,comp:['yasha','ultimate_orb','recipe'],into:[],pr:['Снятие дебаффов','Иллюзии','Статы'],co:['Не даёт брони'],sit:['vs_disable','carry'],pop:true},
+{k:'butterfly',n:'Butterfly',c:'artifact',p:5000,st:{agility:30,attackSpeed:30,evasion:30},a:null,ps:{n:'Evasion',d:'Даёт 30% шанс уклонения от атак.',cd:0,m:0},comp:['talisman_of_evasion','quarterstaff','recipe'],into:[],pr:['Уклонение','Скорость атаки','Мобильность'],co:['Не защищает от магии'],sit:['vs_physical','carry'],pop:true},
+{k:'greater_crit',n:'Daedalus',c:'artifact',p:5100,st:{damage:88},a:null,ps:{n:'Critical Strike',d:'Даёт 30% шанс крита на 225% урона.',cd:0,m:0},comp:['lesser_crit','demon_edge','recipe'],into:[],pr:['Огромный DPS'],co:['Нет выживаемости'],sit:['damage'],pop:true},
+{k:'desolator',n:'Desolator',c:'artifact',p:3500,st:{damage:50},a:null,ps:{n:'Corruption',d:'Атаки снижают броню цели на 6 на 7 сек.',cd:0,m:0},comp:['mithril_hammer','blight_stone'],into:[],pr:['Снижение брони','Урон'],co:['Нет выживаемости'],sit:['physical'],pop:true},
+{k:'satanic',n:'Satanic',c:'artifact',p:5050,st:{strength:25,damage:50,lifesteal:25},a:{n:'Unholy Rage',d:'+175% вампиризма на 6 сек.',cd:35,m:0},ps:null,comp:['morbid_mask','reaver','claymore','recipe'],into:[],pr:['Огромный вампиризм','HP'],co:['Дорого'],sit:['lifesteal'],pop:true},
+{k:'skadi',n:'Eye of Skadi',c:'artifact',p:5300,st:{allStats:22,health:220,mana:220},a:null,ps:{n:'Cold Attack',d:'Атаки замедляют скорость передвижения и атаки цели.',cd:0,m:0},comp:['ultimate_orb','point_booster','orb_of_venom'],into:[],pr:['Замедление','Много статов'],co:['Нет урона напрямую'],sit:['slow'],pop:false},
+{k:'radiance',n:'Radiance',c:'artifact',p:4700,st:{damage:70,evasion:15},a:{n:'Burn',d:'Наносит 60 урона в секунду врагам в радиусе 700.',cd:0,m:0},ps:null,comp:['relic','recipe'],into:[],pr:['Урон по площади','Уклонение','Фарм'],co:['Дорого'],sit:['farming','teamfight'],pop:true},
+{k:'mjollnir',n:'Mjollnir',c:'artifact',p:5500,st:{damage:24,attackSpeed:80},a:{n:'Static Charge',d:'Даёт цель щитом, который бьёт молниями атакующих (200 урона).',cd:35,m:0},ps:{n:'Chain Lightning',d:'25% шанс ударить молнией на 180 урона.',cd:0,m:0},comp:['mjollnir','hyperstone','recipe'],into:[],pr:['Массовый урон','Скорость атаки'],co:['Дорого'],sit:['teamfight'],pop:true},
+{k:'assault',n:'Assault Cuirass',c:'artifact',p:5125,st:{armor:10,attackSpeed:30},a:null,ps:{n:'Assault Aura',d:'+5 брони и +30 AS союзникам, -5 брони врагам в радиусе 900.',cd:0,m:0},comp:['platemail','hyperstone','chainmail','recipe'],into:[],pr:['Аура для команды'],co:['Нет HP'],sit:['teamfight','vs_physical'],pop:true},
+{k:'shivas_guard',n:"Shiva's Guard",c:'artifact',p:4850,st:{intelligence:30,armor:15},a:{n:'Arctic Blast',d:'Замедляет врагов в радиусе 900 на 40% и наносит 200 урона.',cd:27,m:100},ps:{n:'Freezing Aura',d:'-45 AS врагам в радиусе 900.',cd:0,m:0},comp:['platemail','mystic_staff','recipe'],into:[],pr:['Замедление','Аура','Защита'],co:['Нет HP'],sit:['teamfight','vs_physical'],pop:true},
+{k:'heart',n:'Heart of Tarrasque',c:'artifact',p:5000,st:{strength:40,health:300,hpRegen:1.5},a:null,ps:{n:'Regeneration',d:'Восстанавливает 1.5% макс. HP в секунду вне боя.',cd:0,m:0},comp:['reaver','vitality_booster','recipe'],into:[],pr:['Огромный пул HP','Реген'],co:['Нет урона'],sit:['tank'],pop:true},
+{k:'abyssal_blade',n:'Abyssal Blade',c:'artifact',p:6150,st:{strength:35,damage:35,health:250},a:{n:'Overwhelm',d:'Оглушает цель на 2 сек (сквозь BKB).',cd:35,m:0},ps:{n:'Bash',d:'25% шанс оглушить на 1.2 сек.',cd:0,m:0},comp:['skull_basher','vanguard','recipe'],into:[],pr:['Стан сквозь BKB','Bash'],co:['Дорого'],sit:['vs_carry'],pop:true},
+{k:'monkey_king_bar',n:'Monkey King Bar',c:'artifact',p:4700,st:{damage:40,attackSpeed:35},a:null,ps:{n:'Pierce',d:'Атаки имеют 80% шанс нанести доп. 70 магического урона и не промахиваться.',cd:0,m:0},comp:['blitz_knuckles','demon_edge','recipe'],into:[],pr:['Против уклонения','Урон'],co:['Только AS'],sit:['vs_evasion','damage'],pop:true},
+{k:'silver_edge',n:'Silver Edge',c:'artifact',p:5700,st:{damage:52,attackSpeed:35,strength:15,agility:15,intelligence:15},a:{n:'Shadow Walk',d:'Невидимость на 14 сек.',cd:25,m:0},ps:{n:'Break',d:'Атака из невидимости накладывает Break на 4 сек (отключает пассивы).',cd:0,m:0},comp:['invis_sword','ultimate_orb','recipe'],into:[],pr:['Break','Невидимость','Статы'],co:['Дорого'],sit:['vs_passive'],pop:true},
+{k:'ethereal_blade',n:'Ethereal Blade',c:'artifact',p:4650,st:{agility:24,strength:24,intelligence:24},a:{n:'Ether Blast',d:'Цель становится эфирной на 4 сек: не может атаковать, получает +40% магического урона.',cd:22,m:150},ps:null,comp:['ultimate_orb','ghost','recipe'],into:[],pr:['Спасение','Усиление магии'],co:['Цель неуязвима к физике'],sit:['magic_damage','save'],pop:false},
+{k:'refresher',n:'Refresher Orb',c:'artifact',p:5000,st:{damage:7,healthRegen:14,manaRegen:7},a:{n:'Reset Cooldowns',d:'Сбрасывает кулдауны всех способностей и предметов.',cd:180,m:350},ps:null,comp:['oblivion_staff','perseverance','recipe'],into:[],pr:['Двойной ульт'],co:['Дорого','Долгий CD','Много маны'],sit:['ult_combo'],pop:true},
+{k:'octarine_core',n:'Octarine Core',c:'artifact',p:4800,st:{health:300,mana:400,cooldownReduction:25},a:null,ps:{n:'Cooldown Reduction',d:'-25% ко всем кулдаунам способностей и предметов.',cd:0,m:0},comp:['soul_booster','mystic_staff','recipe'],into:[],pr:['-25% CD','HP и мана'],co:['Нет урона'],sit:['caster'],pop:true},
+{k:'bloodthorn',n:'Bloodthorn',c:'artifact',p:6250,st:{intelligence:30,attackSpeed:60,manaRegen:4,damage:40},a:{n:'Soul Burn',d:'Сайленс + все атаки по цели критуют 130% на 5 сек.',cd:15,m:100},ps:null,comp:['orchid','hyperstone','recipe'],into:[],pr:['Сайленс + криты','Против керри'],co:['Дорого'],sit:['vs_carry'],pop:false},
+{k:'hurricane_pike',n:'Hurricane Pike',c:'artifact',p:4450,st:{agility:20,strength:20,intelligence:20,health:200,mana:200},a:{n:'Hurricane Thrust',d:'Толкает себя и цель в противоположные стороны на 450 юнитов. +5 атак по цели.',cd:19,m:0},ps:null,comp:['force_staff','dragon_lance','recipe'],into:[],pr:['Дистанция','Спасение','+5 атак'],co:['Дорого'],sit:['ranged_carry'],pop:false},
+{k:'nullifier',n:'Nullifier',c:'artifact',p:4375,st:{damage:60,armor:8},a:{n:'Nullify',d:'Снимает положительные эффекты и запрещает использовать предметы на 5 сек.',cd:10,m:0},ps:null,comp:['relic','hammer','recipe'],into:[],pr:['Контр-предмет','Против Ghost'],co:['Не работает на способности'],sit:['vs_items'],pop:false},
+{k:'harpoon',n:'Harpoon',c:'artifact',p:4700,st:{strength:25,agility:10,intelligence:10,damage:25,attackSpeed:10},a:{n:'Draw',d:'Притягивает врага к себе на 700 юнитов.',cd:16,m:0},ps:{n:'Echo Strike',d:'Двойной удар после способности.',cd:6,m:0},comp:['echo_sabre','sange','recipe'],into:[],pr:['Притягивание','Двойной удар'],co:['Дорого'],sit:['initiation'],pop:false},
+{k:'gleipnir',n:'Gleipnir',c:'artifact',p:4550,st:{intelligence:20,agility:20,strength:20,damage:30},a:{n:'Eternal Chains',d:'Связывает врагов в радиусе 400 на 2 сек.',cd:18,m:100},ps:{n:'Chain Lightning',d:'25% шанс ударить молнией на 140 урона по площади.',cd:0,m:0},comp:['rod_of_atos','mjollnir','recipe'],into:[],pr:['AoE-контроль','Урон по площади'],co:['Дорого'],sit:['teamfight'],pop:false},
+{k:'mage_slayer',n:'Mage Slayer',c:'artifact',p:2750,st:{damage:20,attackSpeed:25,magicResist:20},a:null,ps:{n:'Mage Slayer',d:'Атаки накладывают -35% магического урона цели на 3 сек.',cd:0,m:0},comp:['cloak','blitz_knuckles','recipe'],into:[],pr:['Против магов'],co:['Только против магии'],sit:['vs_magic'],pop:false},
+{k:'aether_lens',n:'Aether Lens',c:'artifact',p:2100,st:{mana:300,manaRegen:2},a:null,ps:{n:'Cast Range',d:'+225 к дальности применения способностей.',cd:0,m:0},comp:['energy_booster','void_stone','recipe'],into:['octarine_core'],pr:['Дальность способностей','Мана'],co:['Нет урона'],sit:['caster'],pop:false},
+{k:'kaya_and_sange',n:'Kaya and Sange',c:'artifact',p:4000,st:{strength:16,intelligence:16,mana:300,manaRegen:2,health:300},a:null,ps:{n:'Maim + Amplify',d:'Усиление магии + замедление от атак.',cd:0,m:0},comp:['kaya','sange','recipe'],into:[],pr:['Магия + HP'],co:['Дорого'],sit:['caster'],pop:false},
+{k:'sange_and_yasha',n:'Sange and Yasha',c:'artifact',p:4000,st:{strength:16,agility:16,attackSpeed:15,moveSpeed:10},a:null,ps:{n:'Greater Maim',d:'30% шанс замедлить и нанести урон.',cd:0,m:0},comp:['sange','yasha','recipe'],into:[],pr:['Мобильность + HP'],co:['Нет активки'],sit:['carry'],pop:false},
+{k:'yasha_and_kaya',n:'Yasha and Kaya',c:'artifact',p:4000,st:{agility:16,intelligence:16,attackSpeed:15,manaRegen:2},a:null,ps:{n:'Amplify + Speed',d:'Усиление магии + мобильность.',cd:0,m:0},comp:['yasha','kaya','recipe'],into:[],pr:['Магия + скорость'],co:['Хрупкий'],sit:['caster'],pop:false},
+{k:'moon_shard',n:'Moon Shard',c:'artifact',p:4000,st:{attackSpeed:140},a:null,ps:{n:'Consume',d:'Можно съесть для постоянного +60 AS.',cd:0,m:0},comp:['hyperstone','recipe'],into:[],pr:['+140 AS'],co:['Нет урона'],sit:['attack_speed'],pop:false},
+{k:'meteor_hammer',n:'Meteor Hammer',c:'artifact',p:2750,st:{strength:12,intelligence:12,health:300},a:{n:'Meteor Hammer',d:'Через 3 сек падает метеор: 400 урона и стан в радиусе.',cd:24,m:0},ps:null,comp:['ogre_axe','crown','recipe'],into:[],pr:['AoE-стан','HP'],co:['Долгая активация'],sit:['teamfight'],pop:false},
+{k:'aghanims_scepter',n:"Aghanim's Scepter",c:'artifact',p:4200,st:{allStats:10,health:175,mana:175},a:null,ps:{n:'Ultimate Upgrade',d:'Улучшает ультимейт героя.',cd:0,m:0},comp:['ogre_axe','staff_of_wizardry','point_booster','blade_of_alacrity'],into:[],pr:['Апгрейд ульта','Статы'],co:['Не работает на всех'],sit:['ult_combo'],pop:true},
+{k:'aghanims_shard',n:"Aghanim's Shard",c:'artifact',p:1400,st:{allStats:2,health:175,mana:175},a:null,ps:{n:'Ability Upgrade',d:'Даёт новую способность или апгрейд.',cd:0,m:0},comp:[],into:[],pr:['Дешёвый апгрейд'],co:['Не работает на всех'],sit:['ult_combo'],pop:true},
+{k:'diffusal_blade',n:'Diffusal Blade',c:'artifact',p:2500,st:{agility:15,intelligence:10,damage:15},a:{n:'Inhibit',d:'Замедляет цель на 40% и сжигает ману на 3 сек.',cd:15,m:0},ps:{n:'Mana Break',d:'Атаки сжигают 50 маны и наносят столько же урона.',cd:0,m:0},comp:['blade_of_alacrity','robe_of_the_magi','recipe'],into:[],pr:['Сжигание маны','Замедление'],co:['Не работает на героев без маны'],sit:['vs_caster'],pop:true},
+{k:'spirit_vessel',n:'Spirit Vessel',c:'artifact',p:2625,st:{allStats:8,health:250,moveSpeed:15},a:{n:'Soul Release',d:'Наносит 4% макс. HP в сек, снижает реген на 45% у цели 8 сек.',cd:7,m:0},ps:null,comp:['urn_of_shadows','vitality_booster','recipe'],into:[],pr:['Анти-хил','Урон'],co:['Нужны заряды'],sit:['vs_heal'],pop:true},
+{k:'bloodstone',n:'Bloodstone',c:'artifact',p:4800,st:{health:550,mana:550,manaRegen:3},a:{n:'Bloodpact',d:'Тратит 30% HP и даёт щит на 3 сек.',cd:30,m:0},ps:{n:'Blood Charge',d:'За каждое убийство рядом +0.4 реген маны и +0.3 реген HP.',cd:0,m:0},comp:['soul_booster','soul_ring','recipe'],into:[],pr:['Мана + HP','Спасение от бурста'],co:['Дорого'],sit:['caster'],pop:false},
+{k:'helm_of_the_dominator',n:'Helm of the Dominator',c:'artifact',p:2350,st:{allStats:6,armor:6,hpRegen:6},a:{n:'Dominate',d:'Подчиняет нейтрального крипа на 60 сек.',cd:45,m:0},ps:null,comp:['helm_of_iron_will','crown','recipe'],into:[],pr:['Контроль крипа','Аура'],co:['Нужен крип'],sit:['push'],pop:false},
+
+{k:'scythe',n:'Scythe of Vyse',c:'artifact',p:5675,st:{intelligence:35,agility:35,strength:35,manaRegen:9},a:{n:'Hex',d:'Превращает цель в курицу на 3.5 сек.',cd:20,m:250},ps:null,comp:['mystic_staff','void_stone','ultimate_orb','recipe'],into:[],pr:['Жёсткий контроль','Статы'],co:['Очень дорого'],sit:['vs_carry'],pop:true},
+{k:'wind_waker',n:'Wind Waker',c:'artifact',p:6500,st:{intelligence:35,moveSpeed:50,manaRegen:4},a:{n:'Cyclone',d:'Подбрасывает цель на 2.5 сек. Можно применять на союзника.',cd:13,m:150},ps:null,comp:['cyclone','mystic_staff','recipe'],into:[],pr:['Спасение союзника','Контроль'],co:['Дорого'],sit:['save'],pop:false},
+{k:'swift_blink',n:'Swift Blink',c:'artifact',p:6800,st:{agility:35,moveSpeed:35},a:{n:'Swift Blink',d:'Телепорт с +40% скорости и +35 уклонения на 6 сек.',cd:15,m:0},ps:null,comp:['blink','eaglesong','recipe'],into:[],pr:['Мобильность + уклонение'],co:['Очень дорого'],sit:['mobility'],pop:false},
+{k:'overwhelming_blink',n:'Overwhelming Blink',c:'artifact',p:6800,st:{strength:35,health:350},a:{n:'Overwhelming Blink',d:'Телепорт + AoE-замедление и урон.',cd:15,m:0},ps:null,comp:['blink','reaver','recipe'],into:[],pr:['Мобильность + AoE'],co:['Очень дорого'],sit:['initiation'],pop:false},
+{k:'arcane_blink',n:'Arcane Blink',c:'artifact',p:6800,st:{intelligence:35,mana:350},a:{n:'Arcane Blink',d:'Телепорт + -50% CD способностей на 6 сек.',cd:15,m:0},ps:null,comp:['blink','mystic_staff','recipe'],into:[],pr:['Мобильность + CDR'],co:['Очень дорого'],sit:['caster'],pop:false},
+{k:'skull_basher',n:'Skull Basher',c:'artifact',p:2875,st:{strength:10,damage:30},a:{n:'Bash',d:'25% шанс оглушить на 1.2 сек (не работает у некоторых героев).',cd:0,m:0},ps:null,comp:['mithril_hammer','belt_of_strength','recipe'],into:['abyssal_blade'],pr:['Bash-стан'],co:['Рандом','Не для всех героев'],sit:['vs_carry'],pop:true},
+
+// ===== NEUTRAL (46) =====
+{k:'trusty_shovel',n:'Trusty Shovel',c:'neutral',p:0,st:{},a:{n:'Dig',d:'Выкапывает случайный предмет или руну (макс. 16 использований).',cd:0,m:0},ps:null,comp:[],into:[],pr:['Бесплатные ресурсы'],co:['Рандом','Только тир 1'],sit:['neutral1'],pop:false},
+{k:'possessed_mask',n:'Possessed Mask',c:'neutral',p:0,st:{lifesteal:20},a:null,ps:{n:'Lifesteal',d:'Даёт 20% вампиризма.',cd:0,m:0},comp:[],into:[],pr:['Вампиризм'],co:['Только тир 1'],sit:['neutral1'],pop:false},
+{k:'keen_optic',n:'Keen Optic',c:'neutral',p:0,st:{mana:300},a:null,ps:{n:'Keen Optic',d:'+300 маны, +25% радиуса применения способностей.',cd:0,m:0},comp:[],into:[],pr:['Мана и радиус'],co:['Только тир 1'],sit:['neutral1'],pop:false},
+{k:'ocean_heart',n:'Ocean Heart',c:'neutral',p:0,st:{allStats:5,mana:100},a:null,ps:{n:'Water Boost',d:'+5 ко всем статам, +100 маны.',cd:0,m:0},comp:[],into:[],pr:['Статы для всех'],co:['Только тир 1'],sit:['neutral1'],pop:false},
+{k:'bullwhip',n:'Bullwhip',c:'neutral',p:0,st:{},a:{n:'Whip',d:'Даёт +25% скорости передвижения на 3 сек.',cd:12,m:0},ps:null,comp:[],into:[],pr:['Мобильность'],co:['Только тир 2'],sit:['neutral2'],pop:false},
+{k:'dragon_scale',n:'Dragon Scale',c:'neutral',p:0,st:{armor:5,magicResist:5},a:null,ps:{n:'Afterburn',d:'Атаки наносят 18 доп. урона в сек 3 сек.',cd:0,m:0},comp:[],into:[],pr:['Броня и резист','Доп. урон'],co:['Только тир 2'],sit:['neutral2'],pop:false},
+{k:'vambrace',n:'Vambrace',c:'neutral',p:0,st:{},a:{n:'Toggle',d:'Переключает +10 к силе/ловкости/интеллекту.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Гибкие статы'],co:['Только тир 2'],sit:['neutral2'],pop:false},
+{k:'paladin_sword',n:'Paladin Sword',c:'neutral',p:0,st:{damage:16,lifesteal:17},a:null,ps:{n:'Greater Heal',d:'+17% вампиризма и урон.',cd:0,m:0},comp:[],into:[],pr:['Урон и вампиризм'],co:['Только тир 3'],sit:['neutral3'],pop:false},
+{k:'ceremonial_robe',n:'Ceremonial Robe',c:'neutral',p:0,st:{intelligence:15,manaRegen:2,magicResist:10},a:null,ps:{n:'Magic Focus',d:'-10% стоимости маны способностей.',cd:0,m:0},comp:[],into:[],pr:['Мана и резист'],co:['Только тир 3'],sit:['neutral3'],pop:false},
+{k:'titan_sliver',n:'Titan Sliver',c:'neutral',p:0,st:{},a:null,ps:{n:'Titanic',d:'+12% базового урона.',cd:0,m:0},comp:[],into:[],pr:['Бонус к урону'],co:['Только тир 3'],sit:['neutral3'],pop:false},
+{k:'spell_prism',n:'Spell Prism',c:'neutral',p:0,st:{},a:null,ps:{n:'Cooldown Reduction',d:'-12% ко всем кулдаунам.',cd:0,m:0},comp:[],into:[],pr:['-12% CD'],co:['Только тир 4'],sit:['neutral4'],pop:false},
+{k:'minotaur_horn',n:'Minotaur Horn',c:'neutral',p:0,st:{},a:{n:'Bull Rush',d:'Даёт невосприимчивость к магии и +20% скорости на 2 сек.',cd:40,m:0},ps:null,comp:[],into:[],pr:['Мини-BKB'],co:['Только тир 4','Долгий CD'],sit:['neutral4'],pop:false},
+{k:'the_leveller',n:'The Leveller',c:'neutral',p:0,st:{},a:null,ps:{n:'Demolish',d:'+40% урона по строениям.',cd:0,m:0},comp:[],into:[],pr:['Сносит башни'],co:['Только тир 4'],sit:['neutral4'],pop:false},
+{k:'fallen_sky',n:'Fallen Sky',c:'neutral',p:0,st:{},a:{n:'Fallen Sky',d:'Призывает метеор: 800 урона и стан 1.5 сек в радиусе 400.',cd:15,m:0},ps:null,comp:[],into:[],pr:['Огромный AoE урон','Стан'],co:['Только тир 5'],sit:['neutral5','teamfight'],pop:false},
+{k:'ex_machina',n:'Ex Machina',c:'neutral',p:0,st:{armor:25},a:{n:'Overclock',d:'Сбрасывает кулдауны всех предметов.',cd:30,m:0},ps:null,comp:[],into:[],pr:['Reset предметов','Броня'],co:['Только тир 5'],sit:['neutral5'],pop:false},
+{k:'mirror_shield',n:'Mirror Shield',c:'neutral',p:0,st:{},a:null,ps:{n:'Mirror Block',d:'Автоматически отражает 75% направленных заклинаний раз в 12 сек.',cd:12,m:0},comp:[],into:[],pr:['Анти-магия'],co:['Только тир 5'],sit:['neutral5','vs_targeted'],pop:false},
+{k:'apex',n:'Apex',c:'neutral',p:0,st:{},a:null,ps:{n:'Apex',d:'+70 к основному атрибуту героя.',cd:0,m:0},comp:[],into:[],pr:['Огромный бонус к атрибуту'],co:['Только тир 5'],sit:['neutral5'],pop:false},
+{k:'broom_handle',n:'Broom Handle',c:'neutral',p:0,st:{damage:8,attackSpeed:15},a:null,ps:null,comp:[],into:[],pr:['Урон и AS'],co:['Только тир 1'],sit:['neutral1'],pop:false},
+{k:'pixie_dust',n:'Pixie Dust',c:'neutral',p:0,st:{evasion:15},a:{n:'Pixie Dust',d:'Даёт +25% уклонения на 5 сек.',cd:20,m:0},ps:null,comp:[],into:[],pr:['Уклонение'],co:['Только тир 1'],sit:['neutral1'],pop:false},
+{k:'seeds_of_serenity',n:'Seeds of Serenity',c:'neutral',p:0,st:{hpRegen:5},a:null,ps:{n:'Serenity',d:'+5 HP/сек. После 5 сек без урона эффект усиливается.',cd:0,m:0},comp:[],into:[],pr:['Реген HP'],co:['Только тир 1'],sit:['neutral1'],pop:false},
+{k:'tumbler_toy',n:"Tumbler's Toy",c:'neutral',p:0,st:{moveSpeed:15},a:{n:'Tumble',d:'Даёт +30% скорости на 2 сек.',cd:10,m:0},ps:null,comp:[],into:[],pr:['Мобильность'],co:['Только тир 1'],sit:['neutral1'],pop:false},
+{k:'elf_tunic',n:'Elven Tunic',c:'neutral',p:0,st:{attackSpeed:10,evasion:10},a:null,ps:null,comp:[],into:[],pr:['AS и уклонение'],co:['Только тир 1'],sit:['neutral1'],pop:false},
+{k:'chipped_vest',n:'Chipped Vest',c:'neutral',p:0,st:{armor:3},a:null,ps:{n:'Retaliate',d:'Возвращает 20 урона атакующим.',cd:0,m:0},comp:[],into:[],pr:['Броня + отражение'],co:['Только тир 1'],sit:['neutral1'],pop:false},
+{k:'arcane_ring',n:'Arcane Ring',c:'neutral',p:0,st:{mana:150},a:null,ps:{n:'Arcane Ring',d:'+150 маны, +0.5 реген маны.',cd:0,m:0},comp:[],into:[],pr:['Мана'],co:['Только тир 1'],sit:['neutral1'],pop:false},
+{k:'pig_pole',n:'Pig Pole',c:'neutral',p:0,st:{allStats:4},a:{n:'Pig Out',d:'Превращает в свинью на 2 сек.',cd:20,m:0},ps:null,comp:[],into:[],pr:['Мини-контроль'],co:['Только тир 1'],sit:['neutral1'],pop:false},
+{k:'spark_of_courage',n:'Spark of Courage',c:'neutral',p:0,st:{damage:10},a:null,ps:{n:'Courage',d:'+8 урона при HP ниже 50%.',cd:0,m:0},comp:[],into:[],pr:['Бонус урона при низком HP'],co:['Только тир 1'],sit:['neutral1'],pop:false},
+{k:'gossamer_cape',n:'Gossamer Cape',c:'neutral',p:0,st:{magicResist:15,evasion:10},a:null,ps:null,comp:[],into:[],pr:['Резист и уклонение'],co:['Только тир 2'],sit:['neutral2'],pop:false},
+{k:'grove_bow',n:'Grove Bow',c:'neutral',p:0,st:{attackRange:100},a:null,ps:{n:'Grove',d:'+100 к дальности атаки, атаки замедляют на 15%.',cd:0,m:0},comp:[],into:[],pr:['Дальность атаки','Замедление'],co:['Только тир 2','Только для дальников'],sit:['neutral2'],pop:false},
+{k:'orb_of_destruction',n:'Orb of Destruction',c:'neutral',p:0,st:{},a:null,ps:{n:'Corruption',d:'Атаки снижают броню на 5 на 4 сек.',cd:0,m:0},comp:[],into:[],pr:['-броня'],co:['Только тир 2'],sit:['neutral2'],pop:false},
+{k:'philosophers_stone',n:"Philosopher's Stone",c:'neutral',p:0,st:{},a:null,ps:{n:'Greed',d:'+80 золота в минуту.',cd:0,m:0},comp:[],into:[],pr:['Пассивное золото'],co:['Только тир 2'],sit:['neutral2'],pop:false},
+{k:'ring_of_aquila',n:'Ring of Aquila',c:'neutral',p:0,st:{damage:10,armor:3,manaRegen:1.4},a:null,ps:{n:'Aquila Aura',d:'+1.4 реген маны и +3 брони союзникам.',cd:0,m:0},comp:[],into:[],pr:['Аура для команды'],co:['Только тир 2'],sit:['neutral2'],pop:false},
+{k:'vampire_fangs',n:'Vampire Fangs',c:'neutral',p:0,st:{lifesteal:15,damage:10},a:null,ps:null,comp:[],into:[],pr:['Вампиризм и урон'],co:['Только тир 2'],sit:['neutral2'],pop:false},
+{k:'dandelion_amulet',n:'Dandelion Amulet',c:'neutral',p:0,st:{},a:{n:'Dandelion',d:'Даёт щит на 150 на 5 сек.',cd:20,m:0},ps:null,comp:[],into:[],pr:['Щит'],co:['Только тир 3'],sit:['neutral3'],pop:false},
+{k:'defiant_shell',n:'Defiant Shell',c:'neutral',p:0,st:{armor:6},a:null,ps:{n:'Defiance',d:'При получении урона +6 брони на 5 сек.',cd:0,m:0},comp:[],into:[],pr:['Броня по триггеру'],co:['Только тир 3'],sit:['neutral3'],pop:false},
+{k:'timeless_relic',n:'Timeless Relic',c:'neutral',p:0,st:{},a:null,ps:{n:'Timeless',d:'+15% к длительности дебаффов и урону от способностей.',cd:0,m:0},comp:[],into:[],pr:['Усиление способностей'],co:['Только тир 4'],sit:['neutral4'],pop:false},
+{k:'stormcrafter',n:'Stormcrafter',c:'neutral',p:0,st:{moveSpeed:25},a:null,ps:{n:'Storm',d:'Периодически бьёт молнией ближайшего врага (125 урона).',cd:4,m:0},comp:[],into:[],pr:['Пассивный урон','Скорость'],co:['Только тир 4'],sit:['neutral4'],pop:false},
+{k:'trickster_cloak',n:'Trickster Cloak',c:'neutral',p:0,st:{evasion:15,magicResist:15},a:{n:'Cloak',d:'Даёт невидимость и +30% резистов на 3 сек.',cd:25,m:0},ps:null,comp:[],into:[],pr:['Уклонение + резист','Побег'],co:['Только тир 4'],sit:['neutral4'],pop:false},
+{k:'penta_edged_sword',n:'Penta-edged Sword',c:'neutral',p:0,st:{damage:35},a:null,ps:{n:'Maim',d:'25% шанс замедлить и нанести доп. урон.',cd:0,m:0},comp:[],into:[],pr:['Урон + замедление'],co:['Только тир 4'],sit:['neutral4'],pop:false},
+{k:'pirate_hat',n:'Pirate Hat',c:'neutral',p:0,st:{},a:null,ps:{n:'Plunder',d:'+150 золота в минуту. Убийства дают больше золота.',cd:0,m:0},comp:[],into:[],pr:['Огромный доход золота'],co:['Только тир 5'],sit:['neutral5'],pop:false},
+{k:'force_boots',n:'Force Boots',c:'neutral',p:0,st:{moveSpeed:115},a:{n:'Force',d:'Толкает героя на 600 юнитов (не блокируется уроном).',cd:8,m:0},ps:null,comp:[],into:[],pr:['Мобильность + Force'],co:['Только тир 5'],sit:['neutral5','mobility'],pop:false},
+{k:'woodland_striders',n:'Woodland Striders',c:'neutral',p:0,st:{moveSpeed:60,hpRegen:10},a:{n:'Woodland',d:'Даёт невидимость в лесу и +15% скорости.',cd:20,m:0},ps:null,comp:[],into:[],pr:['Скорость и реген'],co:['Только тир 5'],sit:['neutral5'],pop:false},
+// ===== ДОБАВЛЕНО ПО ПАТЧУ 7.42 =====
+{k:'blood_grenade',n:'Blood Grenade',c:'starter',p:50,st:{},a:{n:'Blood Grenade',d:'Бросает гранату, которая наносит урон и замедляет врага.',cd:10,m:0},ps:null,comp:[],into:['bloodslinger'],pr:['Дешёвый харасс и замедление'],co:['Одноразовый расходник'],sit:['lane'],pop:false},
+{k:'bloodslinger',n:'Bloodslinger',c:'upgrade',p:925,st:{health:100,intelligence:8,manaRegen:1.25},a:{n:'Sling Grenade',d:'Бросает гранату: взрыв наносит 50 урона, затем 5 секунд наносит 15 магического урона в секунду и замедляет врагов. Общая перезарядка с Blood Grenade.',cd:30,m:0},ps:null,comp:['sobi_mask','mantle','mantle','blood_grenade','recipe'],into:[],pr:['Улучшенная граната','Дальность применения 1200'],co:['Тратит 75 здоровья','Требует точного применения'],sit:['support','lane'],pop:true},
+{k:'caduceus',n:'Caduceus',c:'upgrade',p:5400,st:{strength:8,agility:8,intelligence:20,health:175,hpRegen:6,manaRegen:3},a:{n:'Force',d:'Активная способность как у Force Staff: отталкивает выбранную цель.',cd:19,m:0},ps:{n:'Empower Spell',d:'Усиливает применение заклинаний по врагам и помогает союзникам.' ,cd:0,m:0},comp:['force_staff','phylactery','recipe'],into:[],pr:['Мобильность Force Staff','Характеристики и усиление заклинаний'],co:['Высокая стоимость'],sit:['support','mobility'],pop:true},
+{k:'ristuls_devotion',n:"Ristul's Devotion",c:'upgrade',p:3800,st:{armor:8,manaRegen:1},a:null,ps:{n:"Ristul's Aura",d:'Аура усиливает урон, вампиризм, вампиризм заклинаниями, броню и восстановление маны союзников в радиусе 1200.' ,cd:0,m:0},comp:['vladmir_offering','splintmail','voodoo_mask'],into:[],pr:['Сильная командная аура','Вампиризм для команды'],co:['Польза зависит от состава команды'],sit:['teamfight','support'],pop:true},
+{k:'sabatons_of_mordiggian',n:'Sabatons of Mordiggian',c:'upgrade',p:5950,st:{},a:{n:'Unholy Strength',d:'Объединяет эффекты Phase Boots и Armlet of Mordiggian в одном предмете.',cd:0,m:0},ps:null,comp:['phase_boots','armlet','recipe'],into:[],pr:['Сочетает актив Armlet и фазовое передвижение','Освобождает слот инвентаря'],co:['Дорогой предмет'],sit:['carry','physical'],pop:true},
+{k:'skypiercer',n:'Skypiercer',c:'upgrade',p:6000,st:{strength:35,armor:5,hpRegen:5,evasion:25},a:{n:'Disarm',d:'Обезоруживает цель на 3 секунды. Дальность применения 500.',cd:15,m:50},ps:null,comp:['heavens_halberd','sange','talisman_of_evasion','recipe'],into:[],pr:['Сильные защитные характеристики','Обезоруживание'],co:['Не действует сквозь невосприимчивость к эффектам'],sit:['vs_physical','tank'],pop:true},
+{k:'starforge',n:'Starforge',c:'upgrade',p:6000,st:{},a:{n:'Meteor Hammer',d:'Улучшенный Meteor Hammer: активная способность наносит дополнительный урон, зависящий от максимального здоровья цели.',cd:24,m:175},ps:null,comp:['meteor_hammer','ultimate_orb'],into:[],pr:['Улучшение Meteor Hammer','Дополнительный урон по героям с большим запасом здоровья'],co:['Требует попадания активной способностью'],sit:['teamfight','push'],pop:true},
+{k:'greater_horn_of_battle',n:'Greater Horn of Battle',c:'neutral',p:0,st:{},a:{n:'Grand Call to Arms',d:'Призывает волну мегакрипов на каждую линию. Выпадает с Терзателя после его смерти.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Мощный эффект на все линии'],co:['Не покупается в магазине'],sit:['push','teamfight'],pop:true},
+
+{k:'red_ledger',n:'Red Ledger',c:'neutral',p:0,st:{},a:{n:'Most Wanted',d:'Создаёт список из 2–5 вражеских героев. За убийство цели из списка даёт 50 золота + 12 за каждый уровень, на который цель выше владельца. Помощь приносит 75% награды.',cd:120,m:0},ps:null,comp:[],into:[],pr:['Дополнительное золото за охоту на выбранных врагов'],co:['Нужно участвовать в убийствах целей из списка'],sit:['neutral1'],pop:true},
+{k:'brick',n:'Brick',c:'neutral',p:0,st:{},a:{n:'Brick',d:'Бросает кирпич с дальности 600: снижает здоровье барьеров цели на 200 и наносит 150 физического урона.',cd:30,m:0},ps:null,comp:[],into:[],pr:['Полезен против защитных барьеров'],co:['Ситуативен против героев без барьеров'],sit:['neutral2'],pop:true},
+{k:'balmhook',n:'Balmhook',c:'neutral',p:0,st:{},a:null,ps:{n:'Balmhook',d:'Нейтральный артефакт третьего разряда. Подробные числовые параметры требуют отдельной сверки с клиентом игры.',cd:0,m:0},comp:[],into:[],pr:['Нейтральный артефакт 3-го разряда'],co:['Не покупается в магазине'],sit:['neutral3'],pop:false},
+{k:'vile_phial',n:'Vile Phial',c:'neutral',p:0,st:{},a:null,ps:{n:'Vile Phial',d:'Нейтральный артефакт третьего разряда. Подробные числовые параметры требуют отдельной сверки с клиентом игры.',cd:0,m:0},comp:[],into:[],pr:['Нейтральный артефакт 3-го разряда'],co:['Не покупается в магазине'],sit:['neutral3'],pop:false},
+{k:'helm_of_the_hivemind',n:'Helm of the Hivemind',c:'neutral',p:0,st:{},a:null,ps:{n:'Brood Awakening',d:'Даёт +120 к дальности применения заклинаний; эффект усиливается за каждого героя с Helm of the Hivemind в обеих командах, одновременно уменьшая максимальное здоровье владельцев.',cd:0,m:0},comp:[],into:[],pr:['Большая дальность применения заклинаний'],co:['Нейтральный артефакт 4-го разряда'],sit:['neutral4'],pop:true},
+{k:'flicker',n:'Flicker',c:'neutral',p:0,st:{},a:{n:'Flicker',d:'Применяет обычное развеивание на владельца и перемещает его в случайном направлении на 200–600 единиц. Не срабатывает, если владелец получал урон от игроков в последние 3 секунды.',cd:8,m:0},ps:null,comp:[],into:[],pr:['Развеивание и перемещение'],co:['Случайное направление','Не спасает сразу после урона от героев'],sit:['neutral4','mobility'],pop:true},
+{k:'giants_ring',n:"Giant's Ring",c:'neutral',p:0,st:{},a:null,ps:{n:"Giant's Foot",d:'Даёт беспрепятственное передвижение. Враги под владельцем каждую секунду получают урон, равный 100% его силы.',cd:0,m:0},comp:[],into:[],pr:['Беспрепятственное передвижение','Урон от силы'],co:['Нейтральный артефакт 4-го разряда'],sit:['neutral4','tank'],pop:true},
+// Компоненты новых предметов 7.42
+{k:'phylactery',n:'Phylactery',c:'magic',p:2600,st:{allStats:7,health:200,mana:200},a:null,ps:{n:'Impetus',d:'После применения заклинания по врагу наносит дополнительный урон и замедляет цель.',cd:0,m:0},comp:['diadem','voodoo_mask'],into:['caduceus'],pr:['Урон после заклинаний'],co:['Требует частого применения способностей'],sit:['caster'],pop:false},
+{k:'vladmir_offering',n:"Vladmir's Offering",c:'upgrade',p:2200,st:{armor:2},a:null,ps:{n:"Vladmir's Aura",d:'Командная аура на урон, броню, восстановление маны и вампиризм.',cd:0,m:0},comp:['morbid_mask','headdress','buckler','recipe'],into:['ristuls_devotion'],pr:['Командная аура'],co:['Зависит от близости союзников'],sit:['support','teamfight'],pop:false},
+{k:'splintmail',n:'Splintmail',c:'basic',p:950,st:{armor:5},a:null,ps:null,comp:[],into:['ristuls_devotion'],pr:['Броня'],co:['Узкое назначение'],sit:['vs_physical'],pop:false},
+{k:'voodoo_mask',n:'Voodoo Mask',c:'basic',p:650,st:{},a:null,ps:{n:'Spell Lifesteal',d:'Даёт вампиризм от урона заклинаниями.',cd:0,m:0},comp:[],into:['ristuls_devotion','phylactery'],pr:['Вампиризм заклинаниями'],co:['Не даёт базовых характеристик'],sit:['caster'],pop:false},
+];
+
+/* ============ УТИЛИТЫ ============ */
+const iconCDN = 'https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/';
+function icon(k){return iconCDN + k + '.png';}
+function byKey(k){return ITEMS.find(x=>x.k===k);}
+function fmtCost(c){return c>0 ? c.toLocaleString('ru-RU')+' 🪙' : 'Нейтральный';}
+
+const STAT_LABELS = {
+  strength:'Сила',agility:'Ловкость',intelligence:'Интеллект',
+  damage:'Урон',armor:'Броня',mana:'Мана',health:'Здоровье',
+  attackSpeed:'Скорость атаки',moveSpeed:'Скорость передвижения',
+  hpRegen:'Реген HP',manaRegen:'Реген маны',magicResist:'Сопр. магии',
+  evasion:'Уклонение',damageBlock:'Блок урона',allStats:'Все атрибуты',
+  lifesteal:'Вампиризм',cooldownReduction:'Снижение CD',attackRange:'Дальность атаки'
+};
+
+const SIT_LABELS = {
+  lane:'выживание в лейне',stats:'ранние статы',mobility:'мобильность',
+  attack_speed:'скорость атаки',armor:'броня',sustain:'реген',mana:'мана',
+  health:'здоровье',strength:'сила',agility:'ловкость',intelligence:'интеллект',
+  farming:'фарм',carry:'керри-статы',chase:'преследование',
+  support_mana:'мана саппорту',support_mobility:'мобильность саппорту',
+  vs_spam:'против спама способностей',setup:'сетап',
+  vs_caster:'против кастеров',burst:'бурст',magic_damage:'магический урон',
+  support:'поддержка',vs_magic:'против магии',vs_disable:'против контроля',
+  vs_physical:'против физики',vs_burst:'против бурста',
+  vs_single_target:'против таргет-заклинаний',vs_targeted:'против таргет-заклинаний',
+  initiation:'инициация',escape:'побег',damage:'урон',lifesteal:'вампиризм',
+  slow:'замедление',teamfight:'командные бои',tank:'танк',
+  vs_carry:'против керри',vs_evasion:'против уклонения',
+  vs_passive:'против пассивок',vs_items:'против предметов',
+  ult_combo:'двойной ульт',caster:'кастер',ranged_carry:'стрелковый керри',
+  physical:'физический урон',vs_invis:'против невидимости',vs_heal:'против лечения',
+  push:'пуш линий',save:'спасение союзника',
+  neutral1:'нейтральный тир 1',neutral2:'нейтральный тир 2',
+  neutral3:'нейтральный тир 3',neutral4:'нейтральный тир 4',neutral5:'нейтральный тир 5'
+};
+
+function card(item, onClick){
+  const d = document.createElement('div');
+  d.className = 'card';
+  d.innerHTML = `
+    <img src="${icon(item.k)}" alt="${item.n}" loading="lazy" onerror="this.style.opacity='.15'">
+    <div class="cname">${item.n}</div>
+    <div class="ccost">${fmtCost(item.p)}</div>
+    <div class="ctags">
+      ${item.a?'<span class="tag red">Актив</span>':''}
+      ${item.ps?'<span class="tag">Пассив</span>':''}
+    </div>`;
+  d.addEventListener('click', () => onClick(item));
+  return d;
+}
+
+function renderHome(){
+  const pop = ITEMS.filter(i=>i.pop).slice(0,8);
+  document.getElementById('popular-grid').replaceChildren(...pop.map(i=>card(i,openItem)));
+
+  document.getElementById('cats-grid').replaceChildren(...Object.entries(CATS).map(([k,c])=>{
+    const n = ITEMS.filter(i=>i.c===k).length;
+    const el = document.createElement('div');
+    el.className='cat-tile';
+    el.innerHTML = `<span class="ci">${c.icon}</span><div><div class="cn">${c.label}</div><div class="cc">${n} предметов</div></div>`;
+    el.onclick = () => { go('catalog'); document.querySelectorAll('.f-cat').forEach(cb=>cb.checked=cb.value===k); catalogFilters.cats.clear(); if(k) catalogFilters.cats.add(k); renderCatalog(); };
+    return el;
+  }));
+
+  const keys = ['bloodslinger','caduceus','ristuls_devotion','sabatons_of_mordiggian','skypiercer','starforge','black_king_bar','blink'].map(byKey).filter(Boolean);
+  document.getElementById('key-grid').replaceChildren(...keys.map(i=>card(i,openItem)));
+}
+
+const catalogFilters = {cats:new Set(),maxPrice:7500,stats:new Set()};
+
+function renderCatalog(){
+  let list = ITEMS.slice();
+  if(catalogFilters.cats.size) list = list.filter(i=>catalogFilters.cats.has(i.c));
+  list = list.filter(i => i.c==='neutral' || i.p <= catalogFilters.maxPrice);
+  for(const s of catalogFilters.stats){
+    if(s==='active') list = list.filter(i=>i.a);
+    if(s==='passive') list = list.filter(i=>i.ps);
+    if(s==='damage') list = list.filter(i=>i.st.damage>0);
+    if(s==='armor') list = list.filter(i=>i.st.armor>0);
+    if(s==='mana') list = list.filter(i=>i.st.mana>0);
+  }
+  const sort = document.getElementById('sort-by').value;
+  if(sort==='name') list.sort((a,b)=>a.n.localeCompare(b.n,'ru'));
+  else if(sort==='cost-asc') list.sort((a,b)=>a.p-b.p);
+  else if(sort==='cost-desc') list.sort((a,b)=>b.p-a.p);
+
+  document.getElementById('cat-count').textContent = `${list.length} предметов`;
+  const grid = document.getElementById('catalog-grid');
+  if(!list.length){ grid.innerHTML = '<div class="empty">Ничего не найдено. Измените фильтры.</div>'; return; }
+  grid.replaceChildren(...list.map(i=>card(i,openItem)));
+}
+
+document.querySelectorAll('.f-cat').forEach(cb=>cb.addEventListener('change',()=>{
+  cb.checked ? catalogFilters.cats.add(cb.value) : catalogFilters.cats.delete(cb.value);
+  renderCatalog();
+}));
+document.getElementById('f-price').addEventListener('input',e=>{
+  catalogFilters.maxPrice = +e.target.value;
+  document.getElementById('f-price-val').textContent = e.target.value;
+  renderCatalog();
+});
+document.querySelectorAll('.f-stat').forEach(cb=>cb.addEventListener('change',()=>{
+  cb.checked ? catalogFilters.stats.add(cb.value) : catalogFilters.stats.delete(cb.value);
+  renderCatalog();
+}));
+document.getElementById('sort-by').addEventListener('change', renderCatalog);
+
+function openItem(item){
+  const ov = document.getElementById('overlay');
+  const md = document.getElementById('modal');
+
+  const statRows = Object.entries(item.st).map(([k,v])=>{
+    const label = STAT_LABELS[k] || k;
+    const val = (k==='cooldownReduction') ? `-${v}%` : `+${v}`;
+    return `<tr><td>${label}</td><td>${val}</td></tr>`;
+  }).join('');
+
+  const abHTML = (ab,type) => ab ? `
+    <div class="ab-block">
+      <div class="ab-n">${type}: ${ab.n}</div>
+      <div class="ab-m">${ab.cd>0?`Перезарядка: ${ab.cd} сек.`:''}${ab.m>0?` | Мана: ${ab.m}`:''}</div>
+      <div class="ab-d">${ab.d}</div>
+    </div>` : '';
+
+  const compNodes = item.comp.map(k=>{const it=byKey(k);return it?`<span class="bnode" onclick="openItem(byKey('${k}'))"><img src="${icon(k)}" onerror="this.style.opacity='.2'">${it.n}</span>`:`<span class="bnode">${k}</span>`;}).join('<span class="arrow">+</span>');
+  const intoNodes = item.into.map(k=>{const it=byKey(k);return it?`<span class="bnode" onclick="openItem(byKey('${k}'))"><img src="${icon(k)}" onerror="this.style.opacity='.2'">${it.n}</span>`:`<span class="bnode">${k}</span>`;}).join('');
+
+  md.innerHTML = `
+    <button class="close" onclick="closeModal()">✕</button>
+    <div class="ihero">
+      <img src="${icon(item.k)}" onerror="this.style.opacity='.15'">
+      <div>
+        <h2>${item.n}</h2>
+        <div class="price">${fmtCost(item.p)}</div>
+        <span class="badge">${CATS[item.c].label}</span>
+      </div>
+    </div>
+    ${statRows?`<div class="sec-title">Характеристики</div><table class="st-table">${statRows}</table>`:''}
+    ${abHTML(item.a,'Активная способность')}
+    ${abHTML(item.ps,'Пассивная способность')}
+    ${item.comp.length?`<div class="sec-title">Собирается из</div><div class="build-row">${compNodes}<span class="arrow">→</span><span class="bnode cur">${item.n}</span></div>`:''}
+    ${item.into.length?`<div class="sec-title">Улучшается в</div><div class="build-row">${intoNodes}</div>`:''}
+    <div class="pc">
+      <div class="pros"><h5>✅ Плюсы</h5><ul>${item.pr.map(p=>`<li>${p}</li>`).join('')}</ul></div>
+      <div class="cons"><h5>❌ Минусы</h5><ul>${item.co.map(c=>`<li>${c}</li>`).join('')}</ul></div>
+    </div>
+    <div class="when"><strong>Когда покупать:</strong> ${item.sit.map(s=>SIT_LABELS[s]||s).join(', ')}.</div>
+  `;
+  ov.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.getElementById('overlay').addEventListener('click',e=>{
+  if(e.target.id==='overlay') closeModal();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape') closeModal();});
+
+function fillCompareSelects(){
+  const opts = ITEMS.slice().sort((a,b)=>a.n.localeCompare(b.n,'ru')).map(i=>`<option value="${i.k}">${i.n}</option>`).join('');
+  ['cmp-a','cmp-b','cmp-c'].forEach(id=>{
+    const s = document.getElementById(id);
+    s.innerHTML = '<option value="">— Выберите предмет —</option>'+opts;
+  });
+  document.getElementById('cmp-a').value = 'black_king_bar';
+  document.getElementById('cmp-b').value = 'sphere';
+}
+
+function renderCompare(){
+  const a = byKey(document.getElementById('cmp-a').value);
+  const b = byKey(document.getElementById('cmp-b').value);
+  const c = byKey(document.getElementById('cmp-c').value);
+  const items = [a,b,c].filter(Boolean);
+  const out = document.getElementById('cmp-result');
+  if(items.length<2){ out.innerHTML='<div class="empty">Выберите минимум два предмета для сравнения.</div>'; return; }
+
+  const metrics = [
+    {l:'Цена', f:i=>i.p, dir:'lower'},
+    {l:'Урон', f:i=>i.st.damage||0, dir:'higher'},
+    {l:'Броня', f:i=>i.st.armor||0, dir:'higher'},
+    {l:'Мана', f:i=>i.st.mana||0, dir:'higher'},
+    {l:'Здоровье', f:i=>i.st.health||0, dir:'higher'},
+    {l:'Сила', f:i=>i.st.strength||0, dir:'higher'},
+    {l:'Ловкость', f:i=>i.st.agility||0, dir:'higher'},
+    {l:'Интеллект', f:i=>i.st.intelligence||0, dir:'higher'},
+    {l:'Скорость атаки', f:i=>i.st.attackSpeed||0, dir:'higher'},
+    {l:'Скорость движения', f:i=>i.st.moveSpeed||0, dir:'higher'},
+  ];
+
+  let html = '<table class="cmp-tbl"><thead><tr><th>Параметр</th>'+items.map(i=>`<th>${i.n}</th>`).join('')+'</tr></thead><tbody>';
+  for(const m of metrics){
+    const vals = items.map(m.f);
+    const best = m.dir==='higher' ? Math.max(...vals) : Math.min(...vals);
+    const allSame = vals.every(v=>v===vals[0]);
+    html += '<tr><td>'+m.l+'</td>'+items.map((i,idx)=>{
+      const v = vals[idx];
+      let cls = '';
+      if(!allSame && v===best && v>0) cls='best';
+      else if(!allSame && v!==best && v>0) cls='worst';
+      return `<td class="${cls}">${v||'—'}</td>`;
+    }).join('')+'</tr>';
+  }
+  html += '<tr><td>Актив</td>'+items.map(i=>`<td>${i.a?i.a.n:'—'}</td>`).join('')+'</tr>';
+  html += '<tr><td>Пассив</td>'+items.map(i=>`<td>${i.ps?i.ps.n:'—'}</td>`).join('')+'</tr>';
+  html += '</tbody></table>';
+  out.innerHTML = html;
+}
+['cmp-a','cmp-b','cmp-c'].forEach(id=>{
+  const s = document.getElementById(id);
+  if(s) s.addEventListener('change', renderCompare);
+});
+
+const SITUATIONS = [
+  {t:'Против магического урона',d:'Снижение магического урона и иммунитет к контролю.',i:['black_king_bar','pipe','sphere','mage_slayer']},
+  {t:'Против физического урона',d:'Уклонение, броня и блок урона.',i:['butterfly','crimson_guard','assault','shivas_guard']},
+  {t:'Для мобильности и инициации',d:'Быстрое перемещение и вход в бой.',i:['blink','force_staff','invis_sword','harpoon']},
+  {t:'Для ускорения фарма',d:'Быстрая зачистка крипов и нейтралов.',i:['battle_fury','radiance','mjollnir','hand_of_midas']},
+  {t:'Против уклонения',d:'Обязательно против PA, Butterfly, Heaven\'s Halberd.',i:['monkey_king_bar','bloodthorn']},
+  {t:'Против пассивных способностей',d:'Break отключает пассивы (PA, Bristleback, Troll).',i:['silver_edge']},
+  {t:'Для спасения союзника',d:'Спасение из-под фокуса или контроля.',i:['force_staff','glimmer_cape','lotus_orb','aeon_disk','wind_waker']},
+  {t:'Для одиночного контроля',d:'Стан сквозь BKB.',i:['abyssal_blade','orchid','scythe']},
+  {t:'Анти-бурст',d:'Выжить в первые секунды боя.',i:['black_king_bar','aeon_disk','blade_mail','sphere']},
+  {t:'Для керри на урон',d:'Максимальный DPS для позиции 1.',i:['butterfly','greater_crit','satanic','manta']},
+  {t:'Против невидимости',d:'Детект невидимых врагов.',i:['ward_sentry','dust','gem']},
+  {t:'Против лечения',d:'Снижение хила и регена врагов.',i:['spirit_vessel','skadi']},
+];
+
+function renderSituations(){
+  document.getElementById('sit-grid').replaceChildren(...SITUATIONS.map(s=>{
+    const el = document.createElement('div');
+    el.className = 'sit-card';
+    el.innerHTML = `<h3>${s.t}</h3><p>${s.d}</p><div class="sit-items">${s.i.map(k=>{const it=byKey(k);return it?`<span onclick="openItem(byKey('${k}'))">${it.n}</span>`:'';}).join('')}</div>`;
+    return el;
+  }));
+}
+
+function setupSearch(inputId, dropId){
+  const inp = document.getElementById(inputId);
+  const drop = document.getElementById(dropId);
+  if(!inp||!drop) return;
+  inp.addEventListener('input',()=>{
+    const q = inp.value.trim().toLowerCase();
+    if(!q){ drop.classList.remove('open'); drop.innerHTML=''; return; }
+    const found = ITEMS.filter(i=>i.n.toLowerCase().includes(q)||i.k.includes(q)).slice(0,8);
+    if(!found.length){ drop.innerHTML='<div class="empty" style="padding:16px">Ничего не найдено</div>'; drop.classList.add('open'); return; }
+    drop.innerHTML = found.map(i=>`<div class="search-item" data-key="${i.k}"><img src="${icon(i.k)}" onerror="this.style.opacity='.2'"><span class="si-name">${i.n}</span><span class="si-cost">${fmtCost(i.p)}</span></div>`).join('');
+    drop.classList.add('open');
+    drop.querySelectorAll('.search-item').forEach(el=>{
+      el.addEventListener('click',()=>{
+        openItem(byKey(el.dataset.key));
+        inp.value=''; drop.classList.remove('open');
+      });
+    });
+  });
+  inp.addEventListener('keydown',e=>{if(e.key==='Escape'){drop.classList.remove('open'); inp.value='';}});
+}
+
+// ИСПРАВЛЕНИЕ ОБОРВАННОГО КОДА ЗДЕСЬ:
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.hsearch') && !e.target.closest('.hero-search')){
+    document.querySelectorAll('.search-drop').forEach(d=>d.classList.remove('open'));
+  }
+});
+
+
+/* ============ HERO BUILDS ============
+   Hero roster comes from OpenDota public API. Suggested item paths are role-based starting points,
+   not live win-rate builds; adapt them to the match. */
+let HERO_DATA=[];
+const BUILD_PRESETS={
+  carry:{start:['tango','branches','slippers','faerie_fire'],early:['power_treads','magic_wand','wraith_band'],core:['mjollnir','manta','black_king_bar','butterfly'],late:['satanic','greater_crit','abyssal_blade'],situational:['skadi','swift_blink','monkey_king_bar']},
+  mid:{start:['tango','branches','faerie_fire'],early:['bottle','power_treads','magic_wand'],core:['witch_blade','blink','black_king_bar'],late:['scythe','shivas_guard','wind_waker'],situational:['orchid','heavens_halberd','aeon_disk']},
+  offlane:{start:['tango','branches','gauntlets'],early:['bracer','boots','magic_wand'],core:['blink','pipe','black_king_bar'],late:['assault','heart','overwhelming_blink'],situational:['crimson_guard','lotus_orb','heavens_halberd']},
+  support:{start:['tango','branches','clarity','enchanted_mango'],early:['tranquil_boots','magic_wand','urn_of_shadows'],core:['glimmer_cape','force_staff','guardian_greaves'],late:['lotus_orb','aeon_disk','wind_waker'],situational:['pipe','solar_crest','caduceus']}
+};
+function heroRole(h){const r=(h.roles||[]).map(x=>String(x).toLowerCase());if(r.includes('carry'))return 'carry';if(r.includes('mid'))return 'mid';if(r.includes('offlane')||r.includes('durable')||r.includes('initiator'))return 'offlane';return 'support';}
+function buildItems(keys){return keys.map(k=>byKey(k)).filter(Boolean);}
+function heroImage(h){return `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/${h.name.replace('npc_dota_hero_','')}.png`;}
+function renderHeroes(){
+ const q=(document.getElementById('heroes-search')?.value||'').trim().toLowerCase();
+ const list=HERO_DATA.filter(h=>(h.localized_name||h.name).toLowerCase().includes(q));
+ const grid=document.getElementById('heroes-grid');
+ grid.replaceChildren(...list.map(h=>{const b=document.createElement('button');b.className='hero-tile';b.innerHTML=`<img loading="lazy" src="${heroImage(h)}" alt=""><strong>${h.localized_name||h.name}</strong><small>${(h.roles||[]).join(' · ')}</small>`;b.addEventListener('click',()=>showHeroBuild(h));return b;}));
+ document.getElementById('heroes-status').textContent=HERO_DATA.length?`${list.length} из ${HERO_DATA.length} героев`:'Не удалось получить список героев. Проверь подключение к интернету.';
+}
+function showHeroBuild(h){
+ const role=heroRole(h), preset=BUILD_PRESETS[role], root=document.getElementById('hero-build');
+ const phases=[['Стартовые предметы',preset.start],['Начало игры',preset.early],['Основные предметы',preset.core],['Поздняя игра',preset.late],['Ситуационные предметы',preset.situational]];
+ root.innerHTML=`<div class="build-hero-head"><img src="${heroImage(h)}" alt=""><div><h2>${h.localized_name||h.name}</h2><p class="muted">Роль для базовой сборки: ${role==='carry'?'Керри':role==='mid'?'Мид':role==='offlane'?'Оффлейн':'Поддержка'}</p></div></div>`+
+ phases.map(([title,keys])=>{const its=buildItems(keys);return `<div class="build-phase"><h3>${title}</h3><div class="build-chips">${its.map(i=>`<span class="build-chip"><img src="${icon(i.k)}" alt="">${i.n}</span>`).join('')}</div></div>`;}).join('')+
+ `<p class="build-disclaimer">Это базовый ориентир по позиции, а не персональная статистическая сборка конкретного героя. Покупки зависят от линии, противников, союзников и темпа матча. Проверяй актуальные гайды и адаптируй предметы.</p>`;
+ root.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function loadHeroes(){
+ const status=document.getElementById('heroes-status');
+ try{const response=await fetch('https://api.opendota.com/api/heroes');if(!response.ok)throw new Error('API');HERO_DATA=await response.json();HERO_DATA.sort((a,b)=>(a.localized_name||'').localeCompare(b.localized_name||'','ru'));renderHeroes();}
+ catch(e){status.textContent='Не удалось загрузить героев. Открой раздел при подключении к интернету.';}
+}
+document.getElementById('heroes-search')?.addEventListener('input',renderHeroes);
+loadHeroes();
+
+function go(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  if(page==='catalog') renderCatalog();
+  if(page==='compare'){ fillCompareSelects(); renderCompare(); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
+
+/* ============ INIT ============ */
+renderHome();
+renderCatalog();
+renderSituations();
+setupSearch('hsearch','hsearch-drop');
+setupSearch('hero-search-input','hero-search-drop');
+fillCompareSelects();
+renderCompare();
+</script>
+
+<script>
+/* Telegram Mini App integration. The site remains usable in a normal browser. */
+(function () {
+  const tg = window.Telegram && window.Telegram.WebApp;
+  if (!tg) return;
+
+  try {
+    tg.ready();
+    tg.expand();
+    if (typeof tg.setHeaderColor === 'function') tg.setHeaderColor('#0a0a0a');
+    if (typeof tg.setBackgroundColor === 'function') tg.setBackgroundColor('#0a0a0a');
+    if (typeof tg.setBottomBarColor === 'function') tg.setBottomBarColor('#0a0a0a');
+  } catch (error) {
+    console.warn('Telegram WebApp setup:', error);
+  }
+
+  const back = tg.BackButton;
+  if (!back) return;
+
+  function syncBackButton() {
+    const modalOpen = !!document.querySelector('#overlay.open');
+    const activePage = document.querySelector('.page.active');
+    const onHome = !activePage || activePage.id === 'page-home';
+    if (modalOpen || !onHome) back.show();
+    else back.hide();
+  }
+
+  back.onClick(function () {
+    const modalOpen = !!document.querySelector('#overlay.open');
+    const activePage = document.querySelector('.page.active');
+    if (modalOpen && typeof closeModal === 'function') {
+      closeModal();
+    } else if (activePage && activePage.id !== 'page-home' && typeof go === 'function') {
+      go('home');
+    }
+    syncBackButton();
+  });
+
+  const observer = new MutationObserver(syncBackButton);
+  document.querySelectorAll('#overlay, .page').forEach(function (element) {
+    observer.observe(element, { attributes: true, attributeFilter: ['class'] });
+  });
+  syncBackButton();
+  window.addEventListener('pageshow', syncBackButton);
+})();
+</script>
+</body>
+</html>
