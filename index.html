@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="Dota Items — справочник предметов Dota 2 с новыми предметами патча 7.42 и разделом сборок героев.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Dota Items — энциклопедия предметов Dota 2">
+<meta property="og:description" content="Изучай характеристики, способности, сборки и сравнивай предметы Dota 2.">
+<meta name="color-scheme" content="dark">
+<script src="https://telegram.org/js/telegram-web-app.js?62"></script>
+<title>Dota Items — энциклопедия предметов Dota 2</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0a0a;--surface:#141414;--surface2:#1c1c1c;--border:#2a2a2a;
+    --red:#c62828;--red-h:#e53935;--text:#e0e0e0;--muted:#9e9e9e;
+    --radius:10px;--shadow:0 8px 24px rgba(198,40,40,.18);
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+  button{cursor:pointer;font-family:inherit;border:none}
+  img{display:block}
+  .header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.94);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+  .hdr{max-width:1280px;margin:0 auto;padding:0 20px;height:64px;
+    display:flex;align-items:center;gap:16px}
+  .logo{font-size:1.25rem;font-weight:900;letter-spacing:-.5px;white-space:nowrap}
+  .logo span{color:var(--red)}
+  .hsearch{flex:1;max-width:380px;position:relative}
+  .hsearch input{width:100%;padding:10px 14px 10px 38px;background:var(--surface);
+    border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.9rem;outline:none;transition:.2s}
+  .hsearch input:focus{border-color:var(--red)}
+  .hsearch::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5;font-size:.85rem}
+  .nav{display:flex;gap:2px;margin-left:auto}
+  .nav button{background:none;color:var(--muted);padding:8px 12px;border-radius:8px;
+    font-size:.85rem;transition:.2s;white-space:nowrap}
+  .nav button:hover{color:var(--text);background:var(--surface2)}
+  .nav button.active{color:var(--red);background:var(--surface2)}
+  .btn-red{background:var(--red);color:#fff;padding:10px 18px;border-radius:8px;
+    font-weight:700;font-size:.85rem;transition:.2s;white-space:nowrap}
+  .btn-red:hover{background:var(--red-h);transform:translateY(-1px)}
+  .search-drop{position:absolute;top:calc(100% + 4px);left:0;right:0;
+    background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    max-height:320px;overflow-y:auto;display:none;z-index:150;
+    box-shadow:0 12px 32px rgba(0,0,0,.8)}
+  .search-drop.open{display:block}
+  .search-item{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;transition:.15s}
+  .search-item:hover{background:var(--surface2)}
+  .search-item img{width:32px;height:32px;object-fit:contain}
+  .search-item .si-name{font-size:.85rem;font-weight:600;flex:1}
+  .search-item .si-cost{font-size:.75rem;color:var(--red);font-weight:700}
+  .container{max-width:1280px;margin:0 auto;padding:0 20px}
+  .page{display:none;padding-bottom:60px}
+  .page.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .hero{text-align:center;padding:56px 20px 40px}
+  .hero h1{font-size:clamp(2.2rem,5vw,3.5rem);font-weight:900;letter-spacing:-1.5px;line-height:1.1}
+  .hero h1 span{color:var(--red)}
+  .hero p{color:var(--muted);max-width:600px;margin:14px auto 26px;font-size:1rem}
+  .hero-search{max-width:660px;margin:0 auto;position:relative}
+  .hero-search input{width:100%;padding:18px 24px 18px 54px;background:var(--surface);
+    border:1px solid var(--border);border-radius:14px;color:var(--text);font-size:1.05rem;
+    outline:none;transition:.2s}
+  .hero-search input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(198,40,40,.18)}
+  .hero-search::before{content:'🔍';position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:1.15rem;opacity:.5;z-index:1}
+  .section{padding:28px 0}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+  .sec-head h2{font-size:1.25rem;font-weight:800;letter-spacing:-.3px}
+  .sec-head h2 span{color:var(--red)}
+  .grid-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+  .grid-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px;text-align:center;transition:.2s;cursor:pointer;position:relative}
+  .card:hover{transform:translateY(-4px);border-color:var(--red);box-shadow:var(--shadow)}
+  .card img{width:52px;height:52px;margin:0 auto 8px;object-fit:contain;
+    filter:drop-shadow(0 2px 6px rgba(0,0,0,.7))}
+  .card .cname{font-size:.82rem;font-weight:700;line-height:1.2;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em}
+  .card .ccost{font-size:.72rem;color:var(--red);font-weight:700;margin-top:6px}
+  .card .ctags{display:flex;gap:4px;justify-content:center;margin-top:6px;flex-wrap:wrap}
+  .tag{font-size:.58rem;padding:2px 6px;border-radius:4px;background:var(--surface2);
+    color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+  .tag.red{color:var(--red)}
+  .cat-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px 14px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:12px}
+  .cat-tile:hover{border-color:var(--red);background:var(--surface2)}
+  .cat-tile .ci{font-size:1.4rem}
+  .cat-tile .cn{font-size:.85rem;font-weight:700}
+  .cat-tile .cc{font-size:.68rem;color:var(--muted);margin-top:2px}
+  .cat-layout{display:grid;grid-template-columns:240px 1fr;gap:22px;align-items:start;padding-top:20px}
+  .filters{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px;position:sticky;top:84px}
+  .fg{margin-bottom:18px}
+  .fg:last-child{margin-bottom:0}
+  .fg h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px}
+  .fg label{display:flex;align-items:center;gap:8px;font-size:.82rem;padding:4px 0;cursor:pointer;transition:.15s}
+  .fg label:hover{color:var(--red)}
+  .fg input[type=checkbox]{accent-color:var(--red);width:14px;height:14px}
+  .fg input[type=range]{width:100%;accent-color:var(--red)}
+  .price-val{font-size:.75rem;color:var(--red);font-weight:700;text-align:right}
+  .catalog-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:.82rem;color:var(--muted)}
+  .catalog-meta select{background:var(--surface);border:1px solid var(--border);color:var(--text);
+    padding:6px 10px;border-radius:6px;font-size:.8rem;outline:none}
+  .overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);
+    backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;
+    padding:24px 16px;overflow-y:auto}
+  .overlay.open{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+    max-width:720px;width:100%;padding:28px;position:relative;animation:up .3s ease;margin:auto 0}
+  @keyframes up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+  .close{position:absolute;top:14px;right:14px;background:var(--surface2);
+    border:1px solid var(--border);color:var(--muted);width:32px;height:32px;
+    border-radius:8px;font-size:1rem;transition:.2s}
+  .close:hover{color:var(--text);border-color:var(--red)}
+  .ihero{display:flex;gap:20px;align-items:flex-start;margin-bottom:22px;padding-right:32px}
+  .ihero img{width:80px;height:80px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(198,40,40,.35))}
+  .ihero h2{font-size:1.5rem;font-weight:900;line-height:1.2}
+  .ihero .price{color:var(--red);font-weight:800;font-size:1.05rem;margin-top:4px}
+  .ihero .badge{display:inline-block;font-size:.68rem;text-transform:uppercase;background:var(--surface2);
+    padding:3px 8px;border-radius:4px;color:var(--muted);margin-top:6px;letter-spacing:.5px}
+  .st-table{width:100%;border-collapse:collapse;margin-bottom:18px}
+  .st-table td{padding:8px 12px;border-bottom:1px solid var(--border);font-size:.88rem}
+  .st-table td:last-child{text-align:right;font-weight:700;color:var(--red)}
+  .ab-block{background:var(--surface2);border-radius:10px;padding:12px 16px;margin-bottom:10px}
+  .ab-block .ab-n{font-weight:800;color:var(--red);margin-bottom:2px;font-size:.92rem}
+  .ab-block .ab-m{font-size:.75rem;color:var(--muted);margin-bottom:6px}
+  .ab-block .ab-d{font-size:.86rem}
+  .sec-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.6px;
+    color:var(--muted);margin:18px 0 8px;font-weight:700}
+  .build-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}
+  .bnode{background:var(--surface2);border:1px solid var(--border);padding:5px 10px;
+    border-radius:6px;font-size:.78rem;display:flex;align-items:center;gap:6px;cursor:pointer;transition:.15s}
+  .bnode:hover{border-color:var(--red)}
+  .bnode img{width:22px;height:22px;object-fit:contain}
+  .bnode.cur{border-color:var(--red);color:var(--red);font-weight:700}
+  .arrow{color:var(--red);font-weight:800;font-size:.9rem}
+  .pc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+  .pc>div{background:var(--surface2);border-radius:10px;padding:12px 14px}
+  .pc h5{font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+  .pc .pros h5{color:#4caf50}
+  .pc .cons h5{color:#ef5350}
+  .pc ul{list-style:none}
+  .pc li{font-size:.82rem;padding:2px 0;color:var(--muted)}
+  .pc li::before{content:'• ';color:var(--red)}
+  .when{font-size:.85rem;color:var(--muted);margin-top:10px;padding:10px 12px;
+    background:rgba(198,40,40,.08);border-left:3px solid var(--red);border-radius:6px}
+  .when strong{color:var(--red)}
+  .cmp-ctrl{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+  .cmp-ctrl select{flex:1;min-width:170px;padding:10px 14px;background:var(--surface);
+    border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.88rem;outline:none}
+  .cmp-ctrl select:focus{border-color:var(--red)}
+  .cmp-tbl{width:100%;border-collapse:collapse;background:var(--surface);
+    border-radius:10px;overflow:hidden}
+  .cmp-tbl th,.cmp-tbl td{padding:11px 14px;border-bottom:1px solid var(--border);
+    font-size:.84rem;text-align:left}
+  .cmp-tbl th{background:var(--surface2);color:var(--muted);font-weight:700}
+  .cmp-tbl th:first-child{color:var(--red)}
+  .best{color:#4caf50;font-weight:800}
+  .worst{color:#ef5350}
+  .sit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  .sit-card{background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:18px;transition:.2s}
+  .sit-card:hover{border-color:var(--red);transform:translateY(-2px)}
+  .sit-card h3{font-size:1rem;margin-bottom:8px;color:var(--red);font-weight:800}
+  .sit-card p{font-size:.84rem;color:var(--muted);margin-bottom:10px}
+  .sit-items{display:flex;flex-wrap:wrap;gap:6px}
+  .sit-items span{background:var(--surface2);padding:4px 10px;border-radius:6px;
+    font-size:.76rem;cursor:pointer;transition:.15s}
+  .sit-items span:hover{background:var(--red);color:#fff}
+  .empty{text-align:center;padding:60px 20px;color:var(--muted);grid-column:1/-1;font-size:.9rem}
+  @media(max-width:960px){
+    .cat-layout{grid-template-columns:1fr}
+    .filters{position:static}
+    .hsearch{display:none}
+    .nav button{padding:8px 8px;font-size:.78rem}
+  }
+  @media(max-width:600px){
+    .hdr{height:auto;min-height:64px;flex-wrap:wrap;padding:10px 14px;gap:8px}
+    .nav{order:3;width:100%;margin-left:0;justify-content:space-between;overflow-x:auto;gap:2px;padding-bottom:2px}
+    .nav button{flex:0 0 auto}
+    .hero{padding:36px 16px 28px}
+    .grid-items{grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:8px}
+    .pc{grid-template-columns:1fr}
+    .ihero{flex-direction:column;align-items:center;text-align:center}
+    .modal{padding:20px}
+    .btn-red{padding:8px 12px;font-size:.78rem}
+    .logo{font-size:1rem}
+    .nav button{padding:7px 8px;font-size:.72rem}
+    .hdr .btn-red{margin-left:auto}
+  }
+
+  /* Telegram Mini App safe areas */
+  html{scroll-padding-top:env(safe-area-inset-top,0px)}
+  body{padding-bottom:env(safe-area-inset-bottom,0px)}
+  .header{top:env(safe-area-inset-top,0px)}
+
+
+  /* Dota Items visual refresh */
+  :root{
+    --bg:#08090d;--surface:#11141b;--surface2:#191e28;--border:#29313e;
+    --red:#e34b43;--red-h:#ff6258;--text:#f1f3f7;--muted:#9aa5b5;
+    --radius:14px;--shadow:0 16px 40px rgba(0,0,0,.38),0 0 24px rgba(227,75,67,.10);
+  }
+  body{
+    background:radial-gradient(ellipse at 50% -15%,rgba(143,35,35,.22),transparent 42%),
+      radial-gradient(ellipse at 100% 35%,rgba(48,61,85,.13),transparent 34%),var(--bg);
+    letter-spacing:.01em;
+  }
+  .header{background:rgba(8,9,13,.86);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 8px 28px rgba(0,0,0,.22)}
+  .hdr{height:72px}
+  .logo{font-size:1.35rem;letter-spacing:-.8px}
+  .logo span,.hero h1 span{background:linear-gradient(110deg,#ff766b,#c83232 72%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .nav button{font-weight:650;padding:9px 13px}
+  .nav button.active{color:#fff;background:rgba(227,75,67,.16);box-shadow:inset 0 0 0 1px rgba(227,75,67,.22)}
+  .btn-red{background:linear-gradient(135deg,#ed554b,#b9282c);border:1px solid rgba(255,255,255,.10);border-radius:10px;box-shadow:0 6px 18px rgba(190,43,43,.22)}
+  .btn-red:hover{background:linear-gradient(135deg,#ff6b60,#d53236);box-shadow:0 9px 24px rgba(190,43,43,.32)}
+  .hsearch input,.hero-search input,.cmp-ctrl select{background:rgba(21,25,34,.9);border-color:#303947;border-radius:12px}
+  .hsearch input:focus,.hero-search input:focus,.cmp-ctrl select:focus{border-color:#e34b43;box-shadow:0 0 0 3px rgba(227,75,67,.14)}
+  .hero{position:relative;isolation:isolate;overflow:hidden;padding:76px 20px 58px}
+  .hero:before{content:"";position:absolute;z-index:-1;width:min(760px,95vw);height:360px;left:50%;top:4px;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(178,43,43,.20),transparent 68%);filter:blur(12px);pointer-events:none}
+  .hero h1{font-size:clamp(2.7rem,7vw,5rem);letter-spacing:-2.8px;text-shadow:0 8px 35px rgba(0,0,0,.35)}
+  .hero p{font-size:1.04rem;line-height:1.75;color:#aab3c1;max-width:640px}
+  .hero-search{max-width:700px}
+  .hero-search input{padding:19px 24px 19px 56px;border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.28)}
+  .section{padding:30px 0}
+  .sec-head{margin-bottom:20px}
+  .sec-head h2{font-size:1.38rem;letter-spacing:-.5px}
+  .grid-items{gap:14px}
+  .card{background:linear-gradient(155deg,rgba(26,31,42,.98),rgba(15,18,25,.98));border-color:rgba(255,255,255,.075);border-radius:15px;padding:17px 12px;box-shadow:0 5px 18px rgba(0,0,0,.16);overflow:hidden}
+  .card:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.045),transparent 42%);opacity:.7;pointer-events:none}
+  .card:hover{transform:translateY(-6px);border-color:rgba(239,83,80,.72);box-shadow:0 16px 30px rgba(0,0,0,.34),0 0 22px rgba(198,40,40,.15)}
+  .card img{width:58px;height:58px;margin-bottom:11px;filter:drop-shadow(0 5px 9px rgba(0,0,0,.55));transition:transform .22s ease}
+  .card:hover img{transform:scale(1.09)}
+  .card .cname{font-size:.85rem;line-height:1.35}
+  .card .ccost{color:#ff7169;font-size:.78rem;margin-top:8px}
+  .tag{background:#252d3a;border:1px solid rgba(255,255,255,.045);border-radius:5px}
+  .cat-tile,.sit-card,.filters{background:linear-gradient(145deg,#151a24,#10141b);border-color:rgba(255,255,255,.08);border-radius:14px;box-shadow:0 7px 20px rgba(0,0,0,.13)}
+  .cat-tile{padding:18px 16px}
+  .cat-tile:hover{border-color:rgba(227,75,67,.6);background:linear-gradient(145deg,#202431,#151922);transform:translateY(-2px)}
+  .filters{padding:19px}
+  .fg h4{color:#c0c8d4;letter-spacing:.8px}
+  .search-drop{background:#151a24;border-color:#303947;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,.55)}
+  .search-item:hover{background:#222a37}
+  .modal{background:#141923;border:1px solid rgba(255,255,255,.1);border-radius:18px;box-shadow:0 25px 80px rgba(0,0,0,.65)}
+  .pc>div{background:#1b222e;border:1px solid rgba(255,255,255,.045)}
+  .bnode{background:#1b222e;border-color:#303947;border-radius:8px}
+  .cmp-tbl{background:#121721;border:1px solid #29313e;border-radius:12px}
+  .cmp-tbl th{background:#1b222e}
+  .sit-card{padding:21px}
+  button,input,select{ -webkit-tap-highlight-color:transparent }
+  button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid rgba(255,105,95,.8);outline-offset:2px}
+  @media(max-width:960px){.hdr{height:auto;min-height:68px}}
+  @media(max-width:600px){
+    .hero{padding:48px 15px 36px}
+    .hero h1{font-size:clamp(2.5rem,13vw,3.6rem);letter-spacing:-1.8px}
+    .hero p{font-size:.92rem;margin:12px auto 22px}
+    .hero-search input{padding:16px 17px 16px 48px;font-size:.95rem}
+    .grid-items{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .card{padding:15px 9px;min-height:126px}
+    .card img{width:54px;height:54px}
+    .sec-head h2{font-size:1.18rem}
+    .nav{border-top:1px solid rgba(255,255,255,.07);padding-top:7px}
+    .nav button{font-size:.73rem}
+    .filters{padding:15px}
+  }
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+
+  .hero-note{color:var(--muted);margin:8px 0 16px;font-size:.92rem}
+  .heroes-search{width:100%;max-width:520px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:13px 15px;margin:8px 0 16px;outline:none}
+  .heroes-search:focus{border-color:var(--red)}
+  .heroes-status{color:var(--muted);font-size:.85rem;margin:6px 0 14px}
+  .heroes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px}
+  .hero-tile{background:linear-gradient(145deg,#1b1b1b,#111);border:1px solid var(--border);border-radius:12px;padding:10px;text-align:left;color:var(--text);transition:transform .2s,border-color .2s;min-width:0}
+  .hero-tile:hover{transform:translateY(-3px);border-color:var(--red)}
+  .hero-tile img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:7px;margin-bottom:8px;background:#252525}
+  .hero-tile strong{font-size:.84rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .hero-tile small{color:var(--muted);font-size:.7rem}
+  .hero-build{margin:22px 0 40px}
+  .build-hero-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+  .build-hero-head img{width:132px;aspect-ratio:16/9;object-fit:cover;border-radius:10px}
+  .build-phase{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px;margin:12px 0}
+  .build-phase h3{font-size:1rem;margin-bottom:10px;color:#fff}
+  .build-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .build-chip{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);padding:7px 9px;border-radius:9px;font-size:.78rem}
+  .build-chip img{width:30px;height:22px;object-fit:contain}
+  .build-disclaimer{color:var(--muted);font-size:.8rem;margin-top:12px;line-height:1.5}
+  @media(max-width:600px){.heroes-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.hero-tile{padding:8px}.build-hero-head img{width:108px}}
+
+
+  .position-picker .filter-btn{background:var(--surface);color:var(--text);border:1px solid var(--border);cursor:pointer}
+  .position-picker .filter-btn.active{background:var(--red);border-color:var(--red);color:#fff}
+  #hero-build a.btn{display:inline-flex;align-items:center;padding:11px 14px;border:1px solid var(--border);border-radius:10px;color:var(--text);text-decoration:none;background:var(--surface)}
+  #hero-build a.btn:hover{border-color:var(--red);color:#fff}
+
+  /* DOTA ITEMS — full hero guide */
+  .guide-shell{margin:20px 0 42px;background:linear-gradient(145deg,#151515,#0d0d0d);border:1px solid #303030;border-radius:18px;overflow:hidden;box-shadow:0 18px 55px #0007}
+  .guide-top{padding:22px;background:radial-gradient(ellipse at 15% 0%,#6d1717 0,transparent 55%),linear-gradient(120deg,#191919,#101010);border-bottom:1px solid #303030}
+  .guide-identity{display:flex;gap:18px;align-items:center}
+  .guide-identity img{width:150px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;border:1px solid #454545}
+  .guide-kicker{font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:#ef6962;font-weight:800}
+  .guide-identity h2{font-size:clamp(1.35rem,4vw,2rem);font-weight:900;margin:4px 0}
+  .guide-sub{color:#a4a4a4;font-size:.85rem;line-height:1.5}
+  .guide-statrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+  .guide-stat{padding:8px 11px;background:#ffffff0b;border:1px solid #ffffff16;border-radius:9px;font-size:.77rem;color:#ddd}
+  .guide-stat b{color:#fff}
+  .guide-positionbar{display:flex;gap:8px;overflow-x:auto;padding:14px 16px;background:#111;border-bottom:1px solid #292929}
+  .guide-position{flex:1;min-width:85px;padding:10px 9px;border:1px solid #363636;border-radius:10px;background:#191919;color:#bbb;font-weight:800;cursor:pointer;white-space:nowrap}
+  .guide-position span{display:block;font-size:.67rem;font-weight:500;color:#888;margin-top:3px}
+  .guide-position.active{background:linear-gradient(135deg,#b72d2d,#791919);border-color:#d34a43;color:#fff;box-shadow:0 5px 18px #a3212140}
+  .guide-tabs{display:flex;gap:5px;overflow-x:auto;padding:12px 16px;border-bottom:1px solid #292929;background:#141414}
+  .guide-tab{border:0;background:transparent;color:#888;padding:10px 13px;border-radius:8px;white-space:nowrap;font-weight:750;cursor:pointer}
+  .guide-tab.active{background:#302020;color:#ff7770}
+  .guide-content{padding:16px}
+  .guide-section{margin-bottom:20px}
+  .guide-section h3{font-size:1rem;margin:0 0 12px;color:#fff;display:flex;align-items:center;gap:8px}
+  .guide-section h3:before{content:'';width:3px;height:17px;background:#cf3a36;border-radius:4px}
+  .guide-muted{color:#929292;font-size:.82rem;line-height:1.55}
+  .guide-item-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px}
+  .guide-item{display:flex;align-items:center;gap:10px;padding:10px;background:#1c1c1c;border:1px solid #333;border-radius:11px;min-width:0}
+  .guide-item img{width:42px;height:34px;object-fit:contain;flex:none}
+  .guide-item strong{display:block;font-size:.79rem;line-height:1.25}
+  .guide-item small{display:block;color:#ef7770;font-size:.7rem;margin-top:4px}
+  .guide-timeline{display:grid;gap:8px}
+  .guide-timeline-row{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center}
+  .guide-time{color:#f07670;font-weight:850;font-size:.78rem;text-align:center;background:#2b1717;border:1px solid #4a2929;padding:8px 4px;border-radius:8px}
+  .guide-timeline-row .guide-item{padding:7px 10px}
+  .guide-skill-grid{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:6px}
+  .guide-level{background:#1b1b1b;border:1px solid #343434;border-radius:8px;padding:7px 2px;text-align:center;min-width:0}
+  .guide-level small{display:block;color:#888;font-size:.63rem;margin-bottom:5px}
+  .guide-level b{display:block;font-size:.76rem;color:#fff}
+  .guide-level.q{border-color:#9e4b35}.guide-level.w{border-color:#3b6d9c}.guide-level.e{border-color:#4d865c}.guide-level.r{border-color:#a17b35}.guide-level.t{border-color:#a27c31;background:#302615}
+  .guide-skill-key{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;color:#aaa;font-size:.74rem}
+  .guide-skill-key span{display:flex;align-items:center;gap:5px}.guide-dot{width:9px;height:9px;border-radius:3px;display:inline-block}
+  .guide-talent-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .guide-talent{background:#1b1b1b;border:1px solid #363636;border-radius:10px;padding:11px;font-size:.78rem;line-height:1.4}
+  .guide-talent b{color:#f17a72;display:block;margin-bottom:5px}
+  .guide-talent.picked{border-color:#9e3733;background:#281717}
+  .guide-ability-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:9px}
+  .guide-ability{background:#1b1b1b;border:1px solid #333;border-radius:11px;padding:12px}
+  .guide-ability strong{color:#fff;font-size:.83rem}.guide-ability p{color:#aaa;font-size:.76rem;line-height:1.5;margin-top:7px}
+  .guide-warning{padding:12px 14px;border:1px solid #5a3c25;background:#281d13;color:#d7b58e;border-radius:10px;font-size:.78rem;line-height:1.5;margin:10px 0}
+  .guide-source{padding:12px 16px;border-top:1px solid #292929;color:#777;font-size:.72rem;line-height:1.5}
+  .guide-hidden{display:none}
+  @media(max-width:600px){.guide-top{padding:15px}.guide-identity{gap:11px}.guide-identity img{width:104px}.guide-content{padding:12px}.guide-skill-grid{grid-template-columns:repeat(6,minmax(0,1fr))}.guide-item-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.guide-position{min-width:76px;padding:9px 7px;font-size:.75rem}}
+
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="hdr">
+    <div class="logo">DOTA <span>ITEMS</span></div>
+    <div class="hsearch">
+      <input id="hsearch" type="text" placeholder="Найти предмет..." autocomplete="off">
+      <div class="search-drop" id="hsearch-drop"></div>
+    </div>
+    <nav class="nav">
+      <button data-page="home" class="active">Главная</button>
+      <button data-page="catalog">Каталог</button>
+      <button data-page="heroes">Герои</button>
+      <button data-page="compare">Сравнение</button>
+      <button data-page="situations">Ситуации</button>
+      <button data-page="tips">Советы</button>
+    </nav>
+    <button class="btn-red" onclick="go('catalog')">📖 Каталог</button>
+  </div>
+</header>
+
+<main>
+  <section id="page-home" class="page active">
+    <div class="hero">
+      <h1>DOTA <span>ITEMS</span></h1>
+      <p>Полная энциклопедия предметов Dota 2: характеристики, сборка, способности и ситуации, когда их покупать.</p>
+      <div class="hero-search">
+        <input id="hero-search-input" type="text" placeholder="Найти предмет по названию..." autocomplete="off">
+        <div class="search-drop" id="hero-search-drop"></div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="section">
+        <div class="sec-head"><h2>🔥 <span>Популярные</span> предметы</h2>
+          <button class="btn-red" style="padding:6px 14px;font-size:.78rem" onclick="go('catalog')">Все →</button></div>
+        <div class="grid-items" id="popular-grid"></div>
+      </div>
+      <div class="section">
+        <div class="sec-head"><h2>📂 <span>Категории</span></h2></div>
+        <div class="grid-cats" id="cats-grid"></div>
+      </div>
+      <div class="section">
+        <div class="sec-head"><h2>🆕 <span>Ключевые</span> артефакты</h2></div>
+        <div class="grid-items" id="key-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="page-catalog" class="page">
+    <div class="container">
+      <div class="cat-layout">
+        <aside class="filters">
+          <div class="fg">
+            <h4>Категория</h4>
+            <label><input type="checkbox" class="f-cat" value="starter">Начальные</label>
+            <label><input type="checkbox" class="f-cat" value="basic">Основные</label>
+            <label><input type="checkbox" class="f-cat" value="upgrade">Улучшения</label>
+            <label><input type="checkbox" class="f-cat" value="magic">Магические</label>
+            <label><input type="checkbox" class="f-cat" value="defensive">Защитные</label>
+            <label><input type="checkbox" class="f-cat" value="artifact">Артефакты</label>
+            <label><input type="checkbox" class="f-cat" value="neutral">Нейтральные</label>
+          </div>
+          <div class="fg">
+            <h4>Цена (золото)</h4>
+            <input type="range" id="f-price" min="0" max="7500" value="7500" step="50">
+            <div class="price-val" id="f-price-val">7500</div>
+          </div>
+          <div class="fg">
+            <h4>Характеристики</h4>
+            <label><input type="checkbox" class="f-stat" value="damage">Даёт урон</label>
+            <label><input type="checkbox" class="f-stat" value="armor">Даёт броню</label>
+            <label><input type="checkbox" class="f-stat" value="mana">Даёт ману</label>
+            <label><input type="checkbox" class="f-stat" value="active">Активный предмет</label>
+            <label><input type="checkbox" class="f-stat" value="passive">Пассивный предмет</label>
+          </div>
+        </aside>
+        <div>
+          <div class="catalog-meta">
+            <span id="cat-count">—</span>
+            <select id="sort-by">
+              <option value="name">По названию (А-Я)</option>
+              <option value="cost-asc">По цене ↑</option>
+              <option value="cost-desc">По цене ↓</option>
+            </select>
+          </div>
+          <div class="grid-items" id="catalog-grid"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="page-heroes" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="sec-head"><h2>🦸 <span>Гайды</span> героев</h2><span class="muted">Все герои Dota 2</span></div>
+      <p class="hero-note">Выбери героя и позицию. В гайде собраны стартовые предметы, тайминги покупок, прокачка способностей по уровням, таланты и описание умений. Сборки разделены по ролям — без универсального шаблона.</p>
+      <input id="heroes-search" class="heroes-search" type="search" placeholder="Найти героя...">
+      <div id="heroes-status" class="heroes-status">Загружаем список героев…</div>
+      <div id="heroes-grid" class="heroes-grid"></div>
+      <div id="hero-build" class="hero-build"></div>
+    </div>
+  </section>
+
+  <section id="page-compare" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="sec-head"><h2>⚖️ <span>Сравнение</span> предметов</h2></div>
+      <div class="cmp-ctrl">
+        <select id="cmp-a"></select>
+        <select id="cmp-b"></select>
+        <select id="cmp-c"></select>
+      </div>
+      <div id="cmp-result"></div>
+    </div>
+  </section>
+
+  <section id="page-situations" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="sec-head"><h2>🎯 Лучшие предметы для <span>ситуаций</span></h2></div>
+      <div class="sit-grid" id="sit-grid"></div>
+    </div>
+  </section>
+
+  <section id="page-tips" class="page">
+    <div class="container" style="padding-top:24px">
+      <div class="sec-head"><h2>💡 <span>Рекомендации</span> по использованию</h2></div>
+      <div class="sit-grid">
+        <div class="sit-card">
+          <h3>Новичкам</h3>
+          <p>• Не покупайте дорогие предметы «по гайду», если не понимаете их назначение.<br><br>
+             • Начинайте с малого: Tango, Magic Wand, Boots of Speed.<br><br>
+             • Black King Bar — не панацея, а инструмент против конкретных угроз (магия и контроль).<br><br>
+             • Открывайте предмет на сайте, чтобы понять, из чего он собирается.</p>
+        </div>
+        <div class="sit-card">
+          <h3>Опытным игрокам</h3>
+          <p>• Адаптируйте сборку под каждую игру — itemization решает.<br><br>
+             • Сравнивайте эффективность по цене/золоту (Maelstrom vs Battle Fury).<br><br>
+             • Учитывайте тайминги нейтральных предметов: нейтральные предметы распределены по четырём тиру.<br><br>
+             • Используйте сравнение на сайте, чтобы взвесить альтернативы.</p>
+        </div>
+        <div class="sit-card">
+          <h3>Про тайминги</h3>
+          <p>• Ранняя игра (0–15 мин): Tango, Magic Stick, Boots, Bracer.<br><br>
+             • Средняя игра (15–35 мин): Blink, BKB, Force Staff, Maelstrom.<br><br>
+             • Лейт (35+ мин): Butterfly, Daedalus, Skadi, Heart, Abyssal.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+/* ============ КАТЕГОРИИ ============ */
+const CATS = {
+  starter:{label:'Начальные',icon:'🌱'},
+  basic:{label:'Основные',icon:'⚙️'},
+  upgrade:{label:'Улучшения',icon:'⬆️'},
+  magic:{label:'Магические',icon:'🔮'},
+  defensive:{label:'Защитные',icon:'🛡️'},
+  artifact:{label:'Артефакты',icon:'💎'},
+  neutral:{label:'Нейтральные',icon:'🌲'},
+};
+
+/* ============ Каталог предметов Dota Items ============ */
+/* Патч 7.42: обновлены цены существующих карточек по официальным заметкам. Новые предметы и характеристики требуют отдельного добавления/сверки. */
+const ITEMS = [
+// ===== STARTER (18) =====
+{k:'tango',n:'Tango',c:'starter',p:90,st:{},a:null,ps:{n:'Shared Tango',d:'Восстанавливает 7 HP/сек в течение 16 сек. Можно применить на союзника.',cd:0,m:0},comp:[],into:['healing_salve'],pr:['Дешёвый хил','Можно делиться с союзником'],co:['Тратится быстро','Занимает слот'],sit:['lane'],pop:true},
+{k:'flask',n:'Healing Salve',c:'starter',p:100,st:{},a:{n:'Salve',d:'Восстанавливает 400 HP за 10 сек.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Мощный хил'],co:['Прерывается уроном'],sit:['lane'],pop:true},
+{k:'clarity',n:'Clarity',c:'starter',p:50,st:{},a:{n:'Clarity',d:'Восстанавливает 150 маны за 25 сек.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Дешёвая мана'],co:['Прерывается уроном'],sit:['lane'],pop:false},
+{k:'faerie_fire',n:'Faerie Fire',c:'starter',p:65,st:{damage:2},a:{n:'Heal',d:'Мгновенно восстанавливает 85 HP.',cd:5,m:0},ps:null,comp:[],into:[],pr:['Бонусный урон','Экстренный хил'],co:['Мало хила'],sit:['lane'],pop:false},
+{k:'enchanted_mango',n:'Enchanted Mango',c:'starter',p:65,st:{hpRegen:.4},a:{n:'Eat',d:'Мгновенно восстанавливает 100 маны.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Мгновенная мана','Реген HP'],co:['Одноразовый'],sit:['lane'],pop:false},
+{k:'branches',n:'Iron Branch',c:'starter',p:55,st:{allStats:1},a:null,ps:null,comp:[],into:['magic_wand'],pr:['+1 ко всем атрибутам','Дёшево'],co:['Занимает слот'],sit:['stats'],pop:true},
+{k:'magic_stick',n:'Magic Stick',c:'starter',p:200,st:{},a:{n:'Energy Charge',d:'Восстанавливает HP и ману за каждую заряженную способность врага (15 HP/мана за заряд).',cd:0,m:0},ps:null,comp:['branches'],into:['magic_wand'],pr:['Спасает в замесах','Не требует маны'],co:['Нужны заряды'],sit:['vs_spam'],pop:true},
+{k:'blight_stone',n:'Blight Stone',c:'starter',p:300,st:{},a:null,ps:{n:'Lesser Corruption',d:'Атаки снижают броню цели на 2 на 8 сек.',cd:0,m:0},comp:[],into:['medallion_of_courage','desolator'],pr:['Снижение брони'],co:['Нет прямого урона'],sit:['physical'],pop:false},
+{k:'slippers',n:'Slippers of Agility',c:'starter',p:140,st:{agility:3},a:null,ps:null,comp:[],into:['wraith_band'],pr:['+3 ловкости'],co:['Мало статов'],sit:['stats'],pop:false},
+{k:'gauntlets',n:'Gauntlets of Strength',c:'starter',p:140,st:{strength:3},a:null,ps:null,comp:[],into:['bracer'],pr:['+3 силы'],co:['Мало статов'],sit:['stats'],pop:false},
+{k:'mantle',n:'Mantle of Intelligence',c:'starter',p:140,st:{intelligence:3},a:null,ps:null,comp:[],into:['null_talisman'],pr:['+3 интеллекта'],co:['Мало статов'],sit:['stats'],pop:false},
+{k:'circlet',n:'Circlet',c:'starter',p:155,st:{allStats:2},a:null,ps:null,comp:[],into:['bracer','wraith_band','null_talisman'],pr:['+2 ко всем атрибутам'],co:['Средняя цена для старта'],sit:['stats'],pop:false},
+{k:'quelling_blade',n:'Quelling Blade',c:'starter',p:100,st:{},a:null,ps:{n:'Chop',d:'+7 урона по крипам, +18 по деревьям.',cd:0,m:0},comp:[],into:['battle_fury'],pr:['Помогает фармить','Убивает деревья'],co:['Только по крипам'],sit:['farming'],pop:false},
+{k:'bottle',n:'Bottle',c:'starter',p:675,st:{hpRegen:2.5,manaRegen:1},a:{n:'Regenerate',d:'Восстанавливает 110 HP и 70 маны за заряд (3 заряда).',cd:0,m:0},ps:null,comp:[],into:[],pr:['Отличный реген для мидера','Руны для перезарядки'],co:['Дорого для старта'],sit:['lane'],pop:true},
+{k:'ward_observer',n:'Observer Ward',c:'starter',p:0,st:{},a:{n:'Place Ward',d:'Устанавливает вард на 6 минут с обзором.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Контроль карты','Бесплатно'],co:['Убивается врагом'],sit:['support'],pop:true},
+{k:'ward_sentry',n:'Sentry Ward',c:'starter',p:50,st:{},a:{n:'Place Sentry',d:'Раскрывает невидимок в радиусе 900 на 7 минут.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Детект невидимок'],co:['Тратится'],sit:['vs_invis'],pop:true},
+{k:'smoke_of_deceit',n:'Smoke of Deceit',c:'starter',p:50,st:{},a:{n:'Smoke',d:'Даёт невидимость для команды на 35 сек.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Скрытая инициация'],co:['Одноразовый'],sit:['initiation'],pop:false},
+{k:'dust',n:'Dust of Appearance',c:'starter',p:80,st:{},a:{n:'Reveal',d:'Раскрывает невидимых врагов на 12 сек.',cd:0,m:0},ps:null,comp:[],into:[],pr:['Мгновенный детект'],co:['Одноразовый'],sit:['vs_invis'],pop:false},
+
+// ===== BASIC (39) =====
+{k:'boots',n:'Boots of Speed',c:'basic',p:500,st:{moveSpeed:45},a:null,ps:null,comp:[],into:['power_treads','phase_boots','arcane_boots','tranquil_boots','travel_boots','guardian_greaves'],pr:['Мобильность обязательна'],co:['Не даёт других бонусов'],sit:['mobility'],pop:true},
+{k:'gloves',n:'Gloves of Haste',c:'basic',p:450,st:{attackSpeed:20},a:null,ps:null,comp:[],into:['power_treads','mjollnir','hand_of_midas'],pr:['+20 скорости атаки'],co:['Только AS'],sit:['attack_speed'],pop:false},
+{k:'chainmail',n:'Chainmail',c:'basic',p:500,st:{armor:4},a:null,ps:null,comp:[],into:['phase_boots','buckler','blade_mail'],pr:['+4 брони'],co:['Только броня'],sit:['armor'],pop:false},
+{k:'ring_of_protection',n:'Ring of Protection',c:'basic',p:175,st:{armor:2},a:null,ps:null,comp:[],into:['buckler','soul_ring','ring_of_basilius'],pr:['+2 брони'],co:['Мало'],sit:['armor'],pop:false},
+{k:'ring_of_regen',n:'Ring of Regen',c:'basic',p:175,st:{hpRegen:1.25},a:null,ps:null,comp:[],into:['tranquil_boots','headress'],pr:['+1.25 HP/сек'],co:['Мало'],sit:['sustain'],pop:false},
+{k:'sobi_mask',n:"Sage's Mask",c:'basic',p:175,st:{manaRegen:.7},a:null,ps:null,comp:[],into:['orchid','ring_of_basilius'],pr:['+0.7 реген маны'],co:['Мало'],sit:['mana'],pop:false},
+{k:'void_stone',n:'Void Stone',c:'basic',p:700,st:{manaRegen:1.25},a:null,ps:null,comp:[],into:['cyclone','sphere','scythe','aether_lens'],pr:['+1.25 реген маны'],co:['Дорого для базового'],sit:['mana'],pop:false},
+{k:'energy_booster',n:'Energy Booster',c:'basic',p:800,st:{mana:250},a:null,ps:null,comp:[],into:['arcane_boots','aghanims_scepter','bloodstone','aether_lens'],pr:['+250 маны'],co:['Нет регена'],sit:['mana'],pop:false},
+{k:'vitality_booster',n:'Vitality Booster',c:'basic',p:1000,st:{health:250},a:null,ps:null,comp:[],into:['aghanims_scepter','heart','aeon_disk','vanguard','soul_booster','spirit_vessel'],pr:['+250 HP'],co:['Нет брони'],sit:['health'],pop:false},
+{k:'point_booster',n:'Point Booster',c:'basic',p:1200,st:{health:175,mana:175},a:null,ps:null,comp:[],into:['aghanims_scepter','aeon_disk','sphere','skadi','soul_booster'],pr:['+175 HP и маны'],co:['Дорого'],sit:['health'],pop:false},
+{k:'ogre_axe',n:'Ogre Axe',c:'basic',p:1000,st:{strength:10},a:null,ps:null,comp:[],into:['black_king_bar','sange','aghanims_scepter','echo_sabre','meteor_hammer'],pr:['+10 силы'],co:['Только сила'],sit:['strength'],pop:false},
+{k:'blade_of_alacrity',n:'Blade of Alacrity',c:'basic',p:1000,st:{agility:10},a:null,ps:null,comp:[],into:['aghanims_scepter','yasha','manta','diffusal_blade','dragon_lance'],pr:['+10 ловкости'],co:['Только ловкость'],sit:['agility'],pop:false},
+{k:'staff_of_wizardry',n:'Staff of Wizardry',c:'basic',p:1000,st:{intelligence:10},a:null,ps:null,comp:[],into:['aghanims_scepter','cyclone','kaya','rod_of_atos'],pr:['+10 интеллекта'],co:['Только интеллект'],sit:['intelligence'],pop:false},
+{k:'broadsword',n:'Broadsword',c:'basic',p:1000,st:{damage:18},a:null,ps:null,comp:[],into:['battle_fury','blade_mail','mage_slayer'],pr:['+18 урона'],co:['Только урон'],sit:['damage'],pop:false},
+{k:'claymore',n:'Claymore',c:'basic',p:1350,st:{damage:21},a:null,ps:null,comp:[],into:['battle_fury','greater_crit','satanic'],pr:['+21 урона'],co:['Только урон'],sit:['damage'],pop:false},
+{k:'mithril_hammer',n:'Mithril Hammer',c:'basic',p:1600,st:{damage:24},a:null,ps:null,comp:[],into:['black_king_bar','desolator','battle_fury','skull_basher'],pr:['+24 урона'],co:['Дорого для компонента'],sit:['damage'],pop:false},
+
+{k:'helm_of_iron_will',n:'Helm of Iron Will',c:'basic',p:975,st:{armor:5,hpRegen:5},a:null,ps:null,comp:[],into:['armlet','hood_of_defiance','helm_of_the_dominator'],pr:['Броня и реген'],co:['Средняя цена'],sit:['armor'],pop:false},
+{k:'cloak',n:'Cloak',c:'basic',p:800,st:{magicResist:20},a:null,ps:null,comp:[],into:['hood_of_defiance','glimmer_cape','pipe','mage_slayer'],pr:['+20% сопр. магии'],co:['Только магия'],sit:['vs_magic'],pop:false},
+{k:'platemail',n:'Platemail',c:'basic',p:1400,st:{armor:10},a:null,ps:null,comp:[],into:['assault','shivas_guard','lotus_orb'],pr:['+10 брони'],co:['Дорого'],sit:['armor'],pop:false},
+{k:'quarterstaff',n:'Quarterstaff',c:'basic',p:900,st:{damage:10,attackSpeed:10},a:null,ps:null,comp:[],into:['butterfly','orchid','echo_sabre','moon_shard'],pr:['Урон и AS'],co:['Средние статы'],sit:['attack_speed'],pop:false},
+{k:'talisman_of_evasion',n:'Talisman of Evasion',c:'basic',p:1300,st:{evasion:20},a:null,ps:null,comp:[],into:['butterfly','heavens_halberd'],pr:['+20% уклонения'],co:['Не от магии'],sit:['vs_physical'],pop:false},
+{k:'ultimate_orb',n:'Ultimate Orb',c:'basic',p:2800,st:{allStats:10},a:null,ps:null,comp:[],into:['skadi','manta','sphere','silver_edge','scythe'],pr:['+10 ко всем статам'],co:['Дорого'],sit:['stats'],pop:false},
+{k:'reaver',n:'Reaver',c:'basic',p:2800,st:{strength:25},a:null,ps:null,comp:[],into:['satanic','heart'],pr:['+25 силы'],co:['Только сила'],sit:['strength'],pop:false},
+{k:'mystic_staff',n:'Mystic Staff',c:'basic',p:2800,st:{intelligence:25},a:null,ps:null,comp:[],into:['shivas_guard','scythe','wind_waker','octarine_core'],pr:['+25 интеллекта'],co:['Только интеллект'],sit:['intelligence'],pop:false},
+{k:'eaglesong',n:'Eaglesong',c:'basic',p:2800,st:{agility:25},a:null,ps:null,comp:[],into:['butterfly','swift_blink'],pr:['+25 ловкости'],co:['Только ловкость'],sit:['agility'],pop:false},
+{k:'relic',n:'Sacred Relic',c:'basic',p:3800,st:{damage:60},a:null,ps:null,comp:[],into:['radiance','nullifier'],pr:['+60 урона'],co:['Очень дорого'],sit:['damage'],pop:false},
+{k:'demon_edge',n:'Demon Edge',c:'basic',p:2200,st:{damage:40},a:null,ps:null,comp:[],into:['greater_crit','monkey_king_bar'],pr:['+40 урона'],co:['Только урон'],sit:['damage'],pop:false},
+{k:'hyperstone',n:'Hyperstone',c:'basic',p:2000,st:{attackSpeed:60},a:null,ps:null,comp:[],into:['assault','mjollnir','moon_shard','bloodthorn'],pr:['+60 AS'],co:['Только AS'],sit:['attack_speed'],pop:false},
+{k:'blitz_knuckles',n:'Blitz Knuckles',c:'basic',p:1000,st:{attackSpeed:35},a:null,ps:null,comp:[],into:['witch_blade','invis_sword','mage_slayer','monkey_king_bar'],pr:['+35 AS'],co:['Только AS'],sit:['attack_speed'],pop:false},
+{k:'crown',n:'Crown',c:'basic',p:450,st:{allStats:4},a:null,ps:null,comp:[],into:['heavens_halberd','solar_crest','harpoon','rod_of_atos','sange','yasha','kaya'],pr:['+4 ко всем статам'],co:['Мало'],sit:['stats'],pop:false},
+{k:'orb_of_venom',n:'Orb of Venom',c:'basic',p:275,st:{},a:null,ps:{n:'Poison Attack',d:'Замедляет цель на 13% и наносит 4 урона в сек 3 сек.',cd:0,m:0},comp:[],into:['skadi','orb_of_corrosion'],pr:['Дешёвый замедляющий эффект'],co:['Слабый урон'],sit:['slow'],pop:false},
+{k:'ring_of_health',n:'Ring of Health',c:'basic',p:700,st:{hpRegen:5},a:null,ps:null,comp:[],into:['vanguard','battle_fury','pipe','hood_of_defiance'],pr:['+5 HP/сек'],co:['Только реген'],sit:['sustain'],pop:false},
+{k:'shadow_amulet',n:'Shadow Amulet',c:'basic',p:1000,st:{},a:{n:'Fade',d:'Даёт невидимость после 1.25 сек.',cd:7,m:0},ps:null,comp:[],into:['invis_sword','glimmer_cape'],pr:['Невидимость'],co:['Долгая активация'],sit:['escape'],pop:false},
+{k:'robe_of_the_magi',n:'Robe of the Magi',c:'basic',p:450,st:{intelligence:6},a:null,ps:null,comp:[],into:['witch_blade','blade_mail','veil_of_discord','diffusal_blade'],pr:['+6 интеллекта'],co:['Только интеллект'],sit:['intelligence'],pop:false},
+{k:'wind_lace',n:'Wind Lace',c:'basic',p:225,st:{moveSpeed:15},a:null,ps:null,comp:[],into:['cyclone','drum_of_endurance','tranquil_boots'],pr:['+15 скорости'],co:['Мало'],sit:['mobility'],pop:false},
+{k:'gem',n:'Gem of True Sight',c:'basic',p:900,st:{},a:null,ps:{n:'True Sight',d:'Раскрывает невидимых врагов в радиусе 900. Теряется при смерти.',cd:0,m:0},comp:[],into:[],pr:['Постоянное з�
